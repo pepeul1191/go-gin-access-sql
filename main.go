@@ -9,7 +9,7 @@ import (
 func setupRoutes(r *gin.Engine) {
 	r.GET("/", controllers.HomeIndex)
 	r.GET("/login", controllers.LoginIndex)
-	r.GET("/apis/v1/foots", controllers.FetchFoots)
+	r.GET("/apis/v1/systems", controllers.SystemFetchAll)
 	r.NoRoute(controllers.Error404)
 }
 
