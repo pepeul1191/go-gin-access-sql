@@ -8,4 +8,6 @@ import (
 
 func SetupRoutes(r *gin.Engine) {
 	r.GET("/", controllers.HomeIndex)
+	r.GET("/login", controllers.LoginIndex)
+	r.NoRoute(controllers.Error404)
 }

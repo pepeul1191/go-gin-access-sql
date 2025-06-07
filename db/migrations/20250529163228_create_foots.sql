@@ -1,10 +1,10 @@
 -- migrate:up
 
-CREATE TABLE pies (
+CREATE TABLE foots (
   id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-  nombre VARCHAR(10) NOT NULL
+  name VARCHAR(10) NOT NULL
 );
 
 -- migrate:down 
 
-DROP TABLE pies;
+DROP TABLE foots;

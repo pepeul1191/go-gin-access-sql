@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS "schema_migrations" (version varchar(128) primary key);
-CREATE TABLE pies (
+CREATE TABLE foots (
   id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-  nombre VARCHAR(10) NOT NULL
+  name VARCHAR(10) NOT NULL
 );
 -- Dbmate schema migrations
 INSERT INTO "schema_migrations" (version) VALUES

@@ -12,5 +12,6 @@ func main() {
 	config.SetupRoutes(r)
 	r.LoadHTMLGlob("views/*")
 	r.Static("/static", "./public")
+
 	r.Run(":8080")
 }

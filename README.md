@@ -1,12 +1,37 @@
 # Plantilla Svelte - Flask
 
-1. Descargar y descomprimir
-2. Abrir el CMD en la carpeta raiz.
-3. Instalar las dependencias de Svelte:
-    > npm install
-4. Instalar librerías de python
+Instalar asdf (si no lo tienes)
+    
+    git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.14.0
+
+Agrega asdf al shell (si usas bash)
+
+    echo -e '\n. "$HOME/.asdf/asdf.sh"' >> ~/.bashrc
+    echo -e '\n. "$HOME/.asdf/completions/asdf.bash"' >> ~/.bashrc
+    source ~/.bashrc
+
+Instalar plugin de Go
+
+    $ asdf plugin add golang https://github.com/asdf-community/asdf-golang.git
+
+Instalar una versión de Go (ejemplo: 1.22.0)
+
+    $ asdf install golang 1.23.0
+
+Establecer la versión de Go global o local
+  
+    $ asdf global golang 1.23.0   # para todo el sistema
+    $ asdf local golang 1.23.0    # para un proyecto específico
+
+Verifica instalación
+    
+    go version
+
+Instalar dependencias de go:
    
-    pip install pandas numpy
+    $ go get github.com/gin-gonic/gin
+    $ go get -u gorm.io/gorm
+    $ go get -u gorm.io/driver/sqlite
 
 Crear migración:
 
@@ -19,15 +44,6 @@ Ejecutar
 Deshacer
 
   > npm run dbmate:rollback
-
-### Descipción
-
-En caso de usar el servicio en python:
-
-    $ sudo pip install virtualenv
-    $ virtualenv -p python3 <<nombre_ambiente>>
-    $ cd <<nombre_ambiente>>
-    $ source bin/activate
 
 Ejemplos de código en Sqlite3
 
