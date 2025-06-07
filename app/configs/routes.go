@@ -7,9 +7,5 @@ import (
 )
 
 func SetupRoutes(r *gin.Engine) {
-	// Rutas de Home
 	r.GET("/", controllers.HomeIndex)
-
-	// Puedes seguir registrando más rutas aquí
-	// r.GET("/users", controllers.UserIndex)
 }
