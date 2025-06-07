@@ -1,4 +1,4 @@
-module accesos
+module access
 
 go 1.22.4
 
