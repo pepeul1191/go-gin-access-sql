@@ -1,0 +1,23 @@
+@baseUrl = http://localhost:8080
+
+### Obtener usuarios
+GET {{baseUrl}}/apis/v1/systems
+Accept: application/json
+
+###
+
+### Crear post
+POST {{baseUrl}}/posts
+Content-Type: application/json
+
+{
+  "title": "Hola Mundo",
+  "body": "Este es un post de prueba usando REST Client con base URL",
+  "userId": 1
+}
+
+###
+
+### Obtener un usuario específico
+GET {{baseUrl}}/users/1
+Accept: application/json
