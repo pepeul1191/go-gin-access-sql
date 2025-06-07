@@ -1,4 +1,15 @@
-# Plantilla Svelte - Flask
+# Accesos con Golang y SQL
+
+- [Accesos con Golang y SQL](#accesos-con-golang-y-sql)
+  - [Configuraciones y Scripts](#configuraciones-y-scripts)
+    - [Golang](#golang)
+    - [Migraciones con DBMATE](#migraciones-con-dbmate)
+    - [Imágnes de PlantUML](#imágnes-de-plantuml)
+  - [Documentación](#documentación)
+
+## Configuraciones y Scripts
+
+### Golang
 
 Instalar asdf (si no lo tienes)
     
@@ -33,17 +44,23 @@ Instalar dependencias de go:
     $ go get -u gorm.io/gorm
     $ go get -u gorm.io/driver/sqlite
 
+### Migraciones con DBMATE
+
+Instalar dependencias:
+
+    $ npm install
+
 Crear migración:
 
-  > npm run dbmate:new <nombre-migración>
+    $ npm run db:new <nombre-migración>
 
 Ejecutar
 
-  > npm run dbmate:up
+    $ npm run db:up
 
 Deshacer
 
-  > npm run dbmate:rollback
+    $ npm run db:rollback
 
 Ejemplos de código en Sqlite3
 
@@ -64,3 +81,18 @@ CREATE TABLE recurso_coleccion (
   FOREIGN KEY (recurso_id) REFERENCES recurso (id)
 );
 ```
+
+### Imágnes de PlantUML
+
+Generar UMLs:
+
+    $ chmod +x render_all_puml.sh
+    $ ./render_all_puml.sh
+
+---
+
+## Documentación
+
+Diagrama de clases
+
+![Diagrama UML](./docs/pics/class_diagram.png)
