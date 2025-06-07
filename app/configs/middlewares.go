@@ -19,6 +19,18 @@ func ViewAuthRequired() gin.HandlerFunc {
 	}
 }
 
+func ViewAuthGoToHome() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		session := sessions.Default(c)
+		if session.Get("status") == "activate" {
+			c.Redirect(302, "/")
+			c.Abort()
+			return
+		}
+		c.Next()
+	}
+}
+
 func APIAuthRequired() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		session := sessions.Default(c)

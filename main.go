@@ -15,7 +15,7 @@ func setupRoutes(r *gin.Engine) {
 	r.GET("/systems", configs.ViewAuthRequired(), controllers.HomeIndex)
 	r.GET("/users", configs.ViewAuthRequired(), controllers.HomeIndex)
 	// login controller
-	r.GET("/login", controllers.LoginIndex)
+	r.GET("/login", configs.ViewAuthGoToHome(), controllers.LoginIndex)
 	r.POST("/login", controllers.LoginSignIn)
 	r.GET("/sign-out", controllers.LoginSignOut)
 	// system controller
