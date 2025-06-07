@@ -43,6 +43,8 @@ Instalar dependencias de go:
     $ go get github.com/gin-gonic/gin
     $ go get -u gorm.io/gorm
     $ go get -u gorm.io/driver/sqlite
+    $ go get github.com/gin-contrib/sessions
+    $ go get github.com/gin-contrib/sessions/cookie
 
 ### Migraciones con DBMATE
 
