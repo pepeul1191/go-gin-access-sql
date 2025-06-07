@@ -12,6 +12,8 @@ import (
 func setupRoutes(r *gin.Engine) {
 	// home controller
 	r.GET("/", configs.ViewAuthRequired(), controllers.HomeIndex)
+	r.GET("/systems", configs.ViewAuthRequired(), controllers.HomeIndex)
+	r.GET("/users", configs.ViewAuthRequired(), controllers.HomeIndex)
 	// login controller
 	r.GET("/login", controllers.LoginIndex)
 	r.POST("/login", controllers.LoginSignIn)
