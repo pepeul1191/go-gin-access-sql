@@ -4,8 +4,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func HomeIndex(c *gin.Context) {
-	c.HTML(200, "home.tmpl", gin.H{
+func LoginIndex(c *gin.Context) {
+	c.HTML(200, "login.tmpl", gin.H{
 		"title":   "Página de Inicio",
 		"mensaje": "Hola desde una plantilla!",
 	})
