@@ -39,3 +39,6 @@ coverage.out
 # Archivos de depuración
 *.prof
 *.pprof
+
+.env
+node_modules

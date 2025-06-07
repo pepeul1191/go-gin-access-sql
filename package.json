@@ -1,0 +1,17 @@
+{
+  "name": "svelte-app",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "db:new": "npx dbmate -d \"db/migrations\" -e \"DB\" new ",
+    "db:up": "npx dbmate -d \"db/migrations\" -e \"DB\" up",
+    "db:rollback": "npx dbmate -d \"db/migrations\" -e \"DB\" rollback",
+    "db:dump": "npx dbmate -d \"db/migrations\" -e \"DB\" dump "
+  },
+  "dependencies": {
+    "dbmate": "^2.15.0",
+    "sqlite3": "^5.1.7",
+    "svelte-app": "file:"
+  }
+}
