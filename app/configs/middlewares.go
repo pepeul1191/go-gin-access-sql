@@ -19,7 +19,7 @@ func ViewAuthRequired() gin.HandlerFunc {
 	}
 }
 
-func AuthRequired() gin.HandlerFunc {
+func APIAuthRequired() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		session := sessions.Default(c)
 		if session.Get("status") != "activate" {

@@ -17,7 +17,7 @@ func setupRoutes(r *gin.Engine) {
 	r.POST("/login", controllers.LoginSignIn)
 	r.GET("/sign-out", controllers.LoginSignOut)
 	// system controller
-	r.GET("/apis/v1/systems", configs.AuthRequired(), controllers.SystemFetchAll)
+	r.GET("/apis/v1/systems", configs.APIAuthRequired(), controllers.SystemFetchAll)
 	// error controller
 	r.NoRoute(controllers.Error404)
 }
