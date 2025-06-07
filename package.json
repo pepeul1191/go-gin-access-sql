@@ -7,11 +7,27 @@
     "db:new": "npx dbmate -d \"db/migrations\" -e \"DB\" new ",
     "db:up": "npx dbmate -d \"db/migrations\" -e \"DB\" up",
     "db:rollback": "npx dbmate -d \"db/migrations\" -e \"DB\" rollback",
-    "db:dump": "npx dbmate -d \"db/migrations\" -e \"DB\" dump "
+    "db:dump": "npx dbmate -d \"db/migrations\" -e \"DB\" dump ",
+    "svelte": "rollup -c -w"
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^24.0.0",
+    "@rollup/plugin-node-resolve": "^15.0.0",
+    "@rollup/plugin-terser": "^0.4.0",
+    "rollup": "^3.15.0",
+    "rollup-plugin-css-only": "^4.3.0",
+    "rollup-plugin-livereload": "^2.0.0",
+    "rollup-plugin-svelte": "^7.1.2"
   },
   "dependencies": {
     "dbmate": "^2.15.0",
     "sqlite3": "^5.1.7",
-    "svelte-app": "file:"
+    "svelte-app": "file:",
+    "bootstrap": "^5.3.3",
+    "sirv-cli": "^2.0.0",
+    "svelte": "^4.2.18",
+    "svelte-routing": "^2.13.0",
+    "font-awesome": "^4.7.0",
+    "axios": "^1.6.0"
   }
 }
