@@ -31,6 +31,13 @@
     }
   };
 
+  const editSystem = (system) => {
+    modalTitle = 'Editar Sistema'
+    systemFormInstance.clean();
+    systemFormInstance.loadSystem(system);
+    modalInstance.show();
+  }
+
   onMount(() => {
     // montar acciones de la tabla
       // ejemplos
@@ -115,7 +122,30 @@
         disabled: false,
         action: addSystem
       }}
-      actionButtons={[]}
+      actionButtons={[
+        {
+          class: 'btn-info',
+          icon: 'fa-eye',
+          label: 'Ver',
+          action: () => {
+            alert('ver');
+          }
+        },
+        {
+          class: 'btn-warning',
+          icon: 'fa-pencil',
+          label: 'Editar',
+          action: editSystem
+        },
+        {
+          class: 'btn-danger',
+          icon: 'fa-trash',
+          label: 'Eliminar',
+          action: () => {
+            alert('eliminar');
+          }
+        },
+      ]}
     />
   </div>
 </div>

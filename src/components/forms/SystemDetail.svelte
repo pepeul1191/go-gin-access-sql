@@ -31,6 +31,15 @@
     };
   }
 
+  export const loadSystem = (system) => {
+    id = system.id;
+    name = system.name;
+    description = system.description;
+    repository = system.repository;
+    created = toDatetimeLocalWithSeconds(system.created);
+    updated = toDatetimeLocalWithSeconds(system.updated);
+  }  
+
   const toDatetimeLocalWithSeconds = (dateStr) => {
     const date = new Date(dateStr);
     const offset = date.getTimezoneOffset();

@@ -87,6 +87,10 @@
   .page-item{
     margin-left: 0px;
   }
+
+  .text-end > .btn{
+    margin-left: 5px;
+  }
 </style>
 
    <!-- Tabla de resultados -->
@@ -109,8 +113,6 @@
       class="btn btn-primary d-flex align-items-center"
       disabled={addButton.disabled}
       on:click={() => {
-        console.log(addButton)
-        console.log('typeof action:', typeof addButton);
         if (typeof addButton.action === 'function') {
           addButton.action();
         } else {
@@ -141,9 +143,15 @@
       {/each}
       {#if actionButtons.length > 0}
         <td class="text-end">
-          <button class="btn btn-info"><i class="fa fa-eye"></i> Ver</button>
-          <button class="btn btn-warning"><i class="fa fa-pencil"></i> Editar</button>
-          <button class="btn btn-danger"><i class="fa fa-trash"></i> Eliminar</button>
+          {#each actionButtons as button}
+            <button class="btn {button.class}" on:click={() => {
+              if (typeof button.action === 'function') {
+                button.action(record);
+              } else {
+                alert('No se seteado un evento');
+              }
+            }}><i class="fa {button.icon}"></i> {button.label}</button>
+          {/each}
         </td>
       {/if}
     </tr>
