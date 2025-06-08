@@ -31,7 +31,7 @@
     };
   }
 
-  const  toDatetimeLocalWithSeconds = (dateStr) => {
+  const toDatetimeLocalWithSeconds = (dateStr) => {
     const date = new Date(dateStr);
     const offset = date.getTimezoneOffset();
     date.setMinutes(date.getMinutes() - offset); // Convertir a hora local

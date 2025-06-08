@@ -4,26 +4,24 @@
   import axios from 'axios';
   import { navigate } from 'svelte-routing';
 
+  export let fetchURL = null;
   export let data = [];
-  export let dataParams = {
-    fetchURL: '',
-    columnKeys: [],
-    columnTypes: [],
-    columnNames: [],
-    columnClasses: [],
-    columnStyles: [],
-    addButton: {
-      display: true,
-      disabled: false,
-      action: () => {
-        alert()
-      }
-    },
+  export let columnKeys = [];
+  export let columnTypes = [];
+  export let columnNames = [];
+  export let columnClasses = [];
+  export let columnStyles = [];
+  export let addButton = {
+    display: true,
+    disabled: false,
+    action: () => {},
   };
+  export let actionButtons = [];
   export let pagnation = false; 
 
   onMount(() => {
     list();
+    console.log(addButton)
   });
 
   export const addRow = () => {
@@ -43,25 +41,29 @@
   }
 
   export const list = () => {
-    axios.get( // url, data, headers
-      dataParams.fetchURL, 
-      {
-        // params: queryParams,
-        headers:{
-          //[CSRF.key]: CSRF.value,
-        }
-      },
-    )
-    .then(function (response) {
-      data = [];
-      data = response.data;
-    })
-    .catch(function (error) {
-      console.error(error);
-    })
-    .then(function () {
-      
-    });
+    if(fetchURL){
+      axios.get( // url, data, headers
+        fetchURL, 
+        {
+          // params: queryParams,
+          headers:{
+            //[CSRF.key]: CSRF.value,
+          }
+        },
+      )
+      .then(function (response) {
+        data = [];
+        data = response.data;
+      })
+      .catch(function (error) {
+        console.error(error);
+      })
+      .then(function () {
+        
+      });
+    }else{
+      console.error('No hay URL para traer datos');
+    }
   };
 </script>
 
@@ -90,8 +92,8 @@
    <!-- Tabla de resultados -->
 <div class="d-flex justify-content-between align-items-center">
   <!-- Parte izquierda: Filtro de filas por página -->
-  {#if pagnation}
-    <div class="d-flex align-items-center me-3">
+  <div class="d-flex align-items-center me-3">
+    {#if pagnation}
       <label for="rows-per-page" class="form-label mb-0 me-2">Filas por página:</label>
       <select class="form-select" id="rows-per-page" style="width: 120px;">
         <option value="5">5</option>
@@ -99,16 +101,22 @@
         <option value="15">15</option>
         <option value="20">20</option>
       </select>
-    </div>
-  {:else}
-    <div class="d-flex align-items-center me-3"></div>
-  {/if}
+    {/if}
+  </div>
   <!-- Parte derecha: Botón "Agregar Registro" con ícono de Font Awesome -->
   <div class="d-flex gap-2">
     <button
       class="btn btn-primary d-flex align-items-center"
-      disabled={dataParams.addButton.disabled}
-      on:click={() => (dataParams.addButton.action ?? alert('No ha seteado un evento'))()}
+      disabled={addButton.disabled}
+      on:click={() => {
+        console.log(addButton)
+        console.log('typeof action:', typeof addButton);
+        if (typeof addButton.action === 'function') {
+          addButton.action();
+        } else {
+          alert('No se seteado un evento');
+        }
+      }}
     >
       <i class="fa fa-plus me-2"></i> Agregar Registro
     </button>
@@ -120,22 +128,24 @@
 <table class="table table-striped">
   <thead>
     <tr>
-      {#each dataParams.columnNames as key, i}
-        <th class="{dataParams.columnClasses[i]}" scope="col">{dataParams.columnNames[i]}</th>
+      {#each columnNames as key, i}
+        <th class="{columnClasses[i]}" scope="col">{columnNames[i]}</th>
       {/each}
     </tr>
   </thead>
   <tbody>
     {#each data as record}
     <tr>
-      {#each dataParams.columnKeys as key, i}
-        <td class="{dataParams.columnClasses[i]}">{record[key]}</td>
+      {#each columnKeys as key, i}
+        <td class="{columnClasses[i]}">{record[key]}</td>
       {/each}
-      <td class="text-end">
-        <button class="btn btn-info"><i class="fa fa-eye"></i> Ver</button>
-        <button class="btn btn-warning"><i class="fa fa-pencil"></i> Editar</button>
-        <button class="btn btn-danger"><i class="fa fa-trash"></i> Eliminar</button>
-      </td>
+      {#if actionButtons.length > 0}
+        <td class="text-end">
+          <button class="btn btn-info"><i class="fa fa-eye"></i> Ver</button>
+          <button class="btn btn-warning"><i class="fa fa-pencil"></i> Editar</button>
+          <button class="btn btn-danger"><i class="fa fa-trash"></i> Eliminar</button>
+        </td>
+      {/if}
     </tr>
     {/each}
     </tbody>
