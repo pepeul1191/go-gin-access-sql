@@ -234,6 +234,11 @@ footer{
     background-color: #f9f9f9;
 }
 
+footer > p {
+  margin-top: 0;
+  margin-bottom: 0rem;
+}
+
 .form-control, .btn, .alert{
     border-radius: 0px;
 }
@@ -254,4 +259,19 @@ footer{
 
 .input-group-text {
     border-radius: 0px;
+}
+
+h1.subtitle{
+    margin-bottom: 0px !important;
+    font-size: 22px !important;
+    margin-top: 10px;
+}
+
+h2.subtitle{
+    margin-bottom: 0px !important;
+    font-size: 20px !important;
+}
+
+.subtitle-row{
+    margin-bottom: 5px !important;
 }

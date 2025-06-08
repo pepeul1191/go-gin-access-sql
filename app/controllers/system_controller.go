@@ -9,6 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// GET: apis/v1/systems
 func SystemFetchAll(c *gin.Context) {
 	var systems []models.System
 	// try to connect to DB
