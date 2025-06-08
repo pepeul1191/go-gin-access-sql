@@ -1,21 +1,35 @@
 <script>
   import DataTable from '../../widgets/DataTable.svelte';
+  import SystemDetail from '../../forms/SystemDetail.svelte';
   import { onMount } from 'svelte';
   import { Modal } from 'bootstrap';
   
   let modalInstance;
+  let systemFormInstance;
   let systemDetailModal;
   let message = null;
   let systemDataTable;
+  let modalTitle;
 
   const addSystem = () => {
+    modalTitle = 'Agregar Sistema'
+    systemFormInstance.clean();
     modalInstance.show();
   }
 
   const handleClose = () => {
-    console.log('Modal cerrado');
+    systemDataTable.list();
     // Aquí puedes emitir un evento o cambiar estado
   }
+
+  const handleFormSave = (event) => {
+    systemDataTable.list();
+    if(event.detail.id){
+      modalTitle = 'Editar Sistema';
+    }else{
+      modalTitle = 'Crear Sistema';
+    }
+  };
 
   onMount(() => {
     // montar acciones de la tabla
@@ -35,17 +49,14 @@
 </style>
 
 <div bind:this={systemDetailModal} class="modal fade" tabindex="-1">
-  <div class="modal-dialog">
+  <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Título del Modal</h5>
+        <h5 class="modal-title">{modalTitle}</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
       </div>
       <div class="modal-body">
-        <p>Contenido del modal...</p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+        <SystemDetail bind:this={systemFormInstance} on:saved={handleFormSave}/>
       </div>
     </div>
   </div>

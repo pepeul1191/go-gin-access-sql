@@ -239,7 +239,7 @@ footer > p {
   margin-bottom: 0rem;
 }
 
-.form-control, .btn, .alert{
+.form-control, .btn, .alert, .modal-content{
     border-radius: 0px;
 }
 

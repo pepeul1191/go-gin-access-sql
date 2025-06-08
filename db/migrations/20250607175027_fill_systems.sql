@@ -19,4 +19,4 @@ VALUES (
 
 -- migrate:down
 
-DROP TABLE systems;
+DELETE FROM systems;
