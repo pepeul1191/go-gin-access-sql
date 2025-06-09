@@ -14,12 +14,22 @@
   export let columnClasses = [];
   export let columnStyles = [];
   export let addButton = {
-    display: true,
+    display: false,
+    disabled: false,
+    action: () => {},
+  };
+  export let saveButton = {
+    display: false,
     disabled: false,
     action: () => {},
   };
   export let actionButtons = [];
-  export let pagnation = false;
+  export let pagnation = {
+    display: false,
+    step: 10,
+    totalPages: 0,
+    actualPage: 0
+  };
   export let queryParams = {}
 
   // delete confirmation modal
@@ -186,7 +196,7 @@
 <div class="d-flex justify-content-between align-items-center">
   <!-- Parte izquierda: Filtro de filas por página -->
   <div class="d-flex align-items-center me-3">
-    {#if pagnation}
+    {#if pagnation.display}
       <label for="rows-per-page" class="form-label mb-0 me-2">Filas por página:</label>
       <select class="form-select" id="rows-per-page" style="width: 120px;">
         <option value="5">5</option>
@@ -198,22 +208,25 @@
   </div>
   <!-- Parte derecha: Botón "Agregar Registro" con ícono de Font Awesome -->
   <div class="d-flex gap-2">
-    <button
-      class="btn btn-primary d-flex align-items-center"
-      disabled={addButton.disabled}
-      on:click={() => {
-        if (typeof addButton.action === 'function') {
-          addButton.action();
-        } else {
-          alert('No se seteado un evento');
-        }
-      }}
-    >
-      <i class="fa fa-plus me-2"></i> Agregar Registro
-    </button>
-    <button class="btn btn-success d-flex align-items-center">
-      <i class="fa fa-check me-2"></i> Guardar Cambios
-    </button>
+    {#if addButton.display}
+      <button
+        class="btn btn-primary d-flex align-items-center"
+        disabled={addButton.disabled}
+        on:click={() => {
+          if (typeof addButton.action === 'function') {
+            addButton.action();
+          } else {
+            alert('No se seteado un evento');
+          }
+        }}>
+        <i class="fa fa-plus me-2"></i> Agregar Registro
+      </button>
+    {/if}
+    {#if saveButton.display}
+      <button class="btn btn-success d-flex align-items-center">
+        <i class="fa fa-check me-2"></i> Guardar Cambios
+      </button>
+    {/if}
   </div>
 </div>    
 <table class="table table-striped">
@@ -246,7 +259,7 @@
     </tr>
     {/each}
     </tbody>
-  {#if pagnation}
+  {#if pagnation.display}
     <tfoot>
       <tr>
         <td colspan="6">

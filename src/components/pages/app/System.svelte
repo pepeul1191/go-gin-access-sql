@@ -147,6 +147,12 @@
         disabled: false,
         action: addSystem
       }}
+      pagnation = {{
+        display: true,
+        step: 10,
+        totalPages: 0,
+        actualPage: 0
+      }}
       actionButtons={[]} 
     />
   </div>
