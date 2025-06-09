@@ -2,6 +2,7 @@
 <script>
   import axios from 'axios';
   import { createEventDispatcher } from 'svelte';
+  import { toDatetimeLocalWithSeconds } from '../../helpers/datetime.js';
   
   const dispatch = createEventDispatcher();
 
@@ -39,13 +40,6 @@
     created = toDatetimeLocalWithSeconds(system.created);
     updated = toDatetimeLocalWithSeconds(system.updated);
   }  
-
-  const toDatetimeLocalWithSeconds = (dateStr) => {
-    const date = new Date(dateStr);
-    const offset = date.getTimezoneOffset();
-    date.setMinutes(date.getMinutes() - offset); // Convertir a hora local
-    return date.toISOString().slice(0, 19); // YYYY-MM-DDTHH:MM:SS
-  }
 
   const cleanMessage = () => {
     setTimeout(() => {

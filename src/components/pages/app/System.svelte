@@ -45,8 +45,34 @@
       //systemDataTable.addButton.action = () => systemDataTable.goToLink('/users');
       //systemDataTable.addButton.action = () => systemDataTable.goToHref(BASE_URL + 'hola');
       //systemDataTable.addButton.action = () => systemDataTable.openTab(BASE_URL + 'hola');
+    
     modalInstance = new Modal(systemDetailModal);
     systemDetailModal.addEventListener('hidden.bs.modal', handleClose);
+    // table action buttons
+    systemDataTable.actionButtons = [
+      {
+        class: 'btn-info',
+        icon: 'fa-eye',
+        label: 'Ver',
+        action: () => {
+          alert('ver');
+        }
+      },
+      {
+        class: 'btn-warning',
+        icon: 'fa-pencil',
+        label: 'Editar',
+        action: editSystem
+      },
+      {
+        class: 'btn-danger',
+        icon: 'fa-trash',
+        label: 'Eliminar',
+        action: (record) => {
+          systemDataTable.askToDeleteRow(record, 'id');
+        }
+      },
+    ];
   });
 </script>
 
@@ -55,7 +81,7 @@
 </style>
 
 <div bind:this={systemDetailModal} class="modal fade" tabindex="-1">
-  <div class="modal-dialog modal-lg">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">{modalTitle}</h5>
@@ -122,30 +148,7 @@
         disabled: false,
         action: addSystem
       }}
-      actionButtons={[
-        {
-          class: 'btn-info',
-          icon: 'fa-eye',
-          label: 'Ver',
-          action: () => {
-            alert('ver');
-          }
-        },
-        {
-          class: 'btn-warning',
-          icon: 'fa-pencil',
-          label: 'Editar',
-          action: editSystem
-        },
-        {
-          class: 'btn-danger',
-          icon: 'fa-trash',
-          label: 'Eliminar',
-          action: () => {
-            alert('eliminar');
-          }
-        },
-      ]}
+      actionButtons={[]} 
     />
   </div>
 </div>

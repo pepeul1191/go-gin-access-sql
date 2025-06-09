@@ -83,3 +83,37 @@ func SystemUpdate(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, system)
 }
+
+// DELETE: /apis/v1/systems/:id
+func SystemDelete(c *gin.Context) {
+	id := c.Param("id")
+	var system models.System
+	// Conexión a la base de datos
+	if err := configs.ConnectToDB(); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error":   "Conexión fallida",
+			"message": err.Error(),
+		})
+		return
+	}
+	// Buscar el sistema por ID
+	if err := configs.DB.First(&system, id).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{
+			"error": "Sistema no encontrado",
+		})
+		return
+	}
+	// Eliminar el sistema
+	if err := configs.DB.Delete(&system).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error":   "No se pudo eliminar el sistema",
+			"message": err.Error(),
+		})
+		return
+	}
+	// Éxito
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Sistema eliminado correctamente",
+		"id":      id,
+	})
+}

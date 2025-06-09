@@ -2,9 +2,11 @@
 <script>
   import { onMount } from 'svelte';
   import axios from 'axios';
+  import { Modal } from 'bootstrap';
   import { navigate } from 'svelte-routing';
 
   export let fetchURL = null;
+  export let deleteURL = fetchURL;
   export let data = [];
   export let columnKeys = [];
   export let columnTypes = [];
@@ -19,10 +21,70 @@
   export let actionButtons = [];
   export let pagnation = false; 
 
+  // delete confirmation modal
+  let deleteConfirmationInstance;
+  let deleteConfirmationModal;
+  let messageConfirmationModal = {
+    text: '',
+    status: ''
+  };
+  let idForDeleting = null;
+  let btnDisabledDeleteConfirmation = false;
+
   onMount(() => {
     list();
+    deleteConfirmationInstance = new Modal(deleteConfirmationModal);
     console.log(addButton)
   });
+
+  export const askToDeleteRow = (record, key) => {
+    idForDeleting = record[key];
+    deleteConfirmationInstance.show();
+  }
+
+  const cleanMessage = () => {
+    setTimeout(() => {
+      messageConfirmationModal = {
+        text: '',
+        status: ''
+      };
+      btnDisabledDeleteConfirmation = false;
+      deleteConfirmationInstance.hide();
+    }, 4300);
+  }
+
+  export const deleteRowFromDB = () => {
+    btnDisabledDeleteConfirmation = true;
+    if(deleteURL && idForDeleting){
+      axios.delete( // url, data, headers
+        deleteURL + '/' + idForDeleting, 
+        {
+          // params: queryParams,
+          headers:{
+            //[CSRF.key]: CSRF.value,
+          }
+        },
+      )
+      .then((response) => {
+        console.log(response);
+        data = data.filter(item => item.id !== idForDeleting);
+        messageConfirmationModal.text = response.data.message ? response.data.message : 'Registro borrado correctamente';
+        messageConfirmationModal.status = 'success';
+        cleanMessage();
+      })
+      .catch((error) => {
+        messageConfirmationModal.text = error.message ? error.message : 'Registro borrado correctamente';;
+        messageConfirmationModal.status = 'danger';
+        console.error(error);
+        cleanMessage();
+      })
+      .then(() => {
+        
+      });
+    }else{
+      console.error('No hay URL para eliminar datos o id a eliminar');
+    }
+  }
 
   export const addRow = () => {
     alert('addRow');
@@ -92,8 +154,34 @@
     margin-left: 5px;
   }
 </style>
-
-   <!-- Tabla de resultados -->
+<!-- modal -->
+<div bind:this={deleteConfirmationModal} class="modal fade" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Confirmación de Eliminación</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        {#if messageConfirmationModal.text != ''}
+          <div class="alert alert-{messageConfirmationModal.status}" role="alert">
+            {messageConfirmationModal.text}
+          </div>
+        {/if}
+        ¿Seguro que quiere borrar el registro?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" disabled={btnDisabledDeleteConfirmation}>
+          <i class="fa fa-times"></i>Cancelar</button>
+        <button type="button" class="btn btn-danger" disabled={btnDisabledDeleteConfirmation}
+        on:click={deleteRowFromDB}>
+          <i class="fa fa-trash"></i> Eliminar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Tabla de resultados -->
 <div class="d-flex justify-content-between align-items-center">
   <!-- Parte izquierda: Filtro de filas por página -->
   <div class="d-flex align-items-center me-3">
