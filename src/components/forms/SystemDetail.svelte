@@ -41,13 +41,16 @@
     updated = toDatetimeLocalWithSeconds(system.updated);
   }  
 
-  const cleanMessage = () => {
+  const cleanMessage = (dispatchToParent) => {
     setTimeout(() => {
       message = {
         text: '',
         status: ''
       };
       btnDisabled = false;
+      if (dispatchToParent){
+        dispatch('saved', { id });
+      }
     }, 4300);
   }
 
@@ -76,8 +79,7 @@
         message.text = 'Se ha creado el sistema';
         message.status = 'success';
         // notificar al padre que se ha actualizado algo
-        dispatch('saved', { id });
-        cleanMessage();
+        cleanMessage(true);
       }else{
         response = await axios.put(BASE_URL + 'apis/v1/systems', formData, {
           headers: {
@@ -87,8 +89,7 @@
         updated = toDatetimeLocalWithSeconds(response.data.updated);
         message.text = 'Se ha editado el sistema';
         message.status = 'success';
-        dispatch('saved', { id });
-        cleanMessage();
+        cleanMessage(true);
       }
       console.log('Datos enviados con éxito:', response.data);
       // Puedes manejar la respuesta aquí, por ejemplo, mostrar un mensaje de éxito
@@ -96,7 +97,7 @@
       console.error('Error al enviar los datos:', error);
       message.text = 'Error al grabar el sistema';
       message.status = 'danger';
-      cleanMessage();
+      cleanMessage(false);
       // Maneja el error (puedes mostrar un mensaje de error en la interfaz de usuario)
     }
   };

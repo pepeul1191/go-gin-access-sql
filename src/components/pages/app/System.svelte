@@ -24,11 +24,7 @@
 
   const handleFormSave = (event) => {
     systemDataTable.list();
-    if(event.detail.id){
-      modalTitle = 'Editar Sistema';
-    }else{
-      modalTitle = 'Crear Sistema';
-    }
+    modalInstance.hide();
   };
 
   const editSystem = (system) => {
