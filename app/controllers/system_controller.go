@@ -13,7 +13,10 @@ import (
 // GET: apis/v1/systems
 func SystemFetchAll(c *gin.Context) {
 	var systems []models.System
-	// try to connect to DB
+	// Obtener parámetros opcionales
+	name := c.Query("name")
+	description := c.Query("description")
+	// Conexión a la base de datos
 	if err := configs.ConnectToDB(); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error":   "No se pudo conectar a la base de datos",
@@ -21,18 +24,24 @@ func SystemFetchAll(c *gin.Context) {
 		})
 		return
 	}
-	// try to execute query
-	if err := configs.DB.Find(&systems).Error; err != nil {
-		c.JSON(
-			http.StatusInternalServerError,
-			gin.H{
-				"error":   "Error al consultar systems",
-				"message": err.Error(),
-			},
-		)
+	// Comenzar la consulta
+	query := configs.DB.Model(&models.System{})
+	// Aplicar filtros opcionales
+	if name != "" {
+		query = query.Where("name LIKE ?", "%"+name+"%")
+	}
+	if description != "" {
+		query = query.Where("description LIKE ?", "%"+description+"%")
+	}
+	// Ejecutar la consulta
+	if err := query.Find(&systems).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error":   "Error al consultar systems",
+			"message": err.Error(),
+		})
 		return
 	}
-	// response
+	// Respuesta
 	c.JSON(http.StatusOK, systems)
 }
 

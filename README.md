@@ -3,6 +3,7 @@
 - [Accesos con Golang y SQL](#accesos-con-golang-y-sql)
   - [Configuraciones y Scripts](#configuraciones-y-scripts)
     - [Golang](#golang)
+    - [Antes de usar los scripts](#antes-de-usar-los-scripts)
     - [Migraciones con DBMATE](#migraciones-con-dbmate)
     - [Imágnes de PlantUML](#imágnes-de-plantuml)
   - [Documentación](#documentación)
@@ -45,6 +46,10 @@ Instalar dependencias de go:
     $ go get -u gorm.io/driver/sqlite
     $ go get github.com/gin-contrib/sessions
     $ go get github.com/gin-contrib/sessions/cookie
+
+### Antes de usar los scripts
+
+    $ pip install faker
 
 ### Migraciones con DBMATE
 

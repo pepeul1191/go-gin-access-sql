@@ -19,7 +19,8 @@
     action: () => {},
   };
   export let actionButtons = [];
-  export let pagnation = false; 
+  export let pagnation = false;
+  export let queryParams = {}
 
   // delete confirmation modal
   let deleteConfirmationInstance;
@@ -107,7 +108,7 @@
       axios.get( // url, data, headers
         fetchURL, 
         {
-          // params: queryParams,
+          params: Object.keys(queryParams).length > 0 ? queryParams : undefined,
           headers:{
             //[CSRF.key]: CSRF.value,
           }
@@ -219,7 +220,7 @@
   <thead>
     <tr>
       {#each columnNames as key, i}
-        <th class="{columnClasses[i]}" scope="col">{columnNames[i]}</th>
+        <th class="{columnClasses[i]}" style="{columnStyles[i]}" scope="col">{columnNames[i]}</th>
       {/each}
     </tr>
   </thead>
@@ -227,10 +228,10 @@
     {#each data as record}
     <tr>
       {#each columnKeys as key, i}
-        <td class="{columnClasses[i]}">{record[key]}</td>
+        <td class="{columnClasses[i]}" style="{columnStyles[i]}">{record[key]}</td>
       {/each}
       {#if actionButtons.length > 0}
-        <td class="text-end">
+        <td class="text-end" styles="">
           {#each actionButtons as button}
             <button class="btn {button.class}" on:click={() => {
               if (typeof button.action === 'function') {

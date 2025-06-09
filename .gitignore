@@ -42,3 +42,4 @@ coverage.out
 
 .env
 node_modules
+scripts/*.sql

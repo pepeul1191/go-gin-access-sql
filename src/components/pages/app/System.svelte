@@ -1,8 +1,9 @@
 <script>
-  import DataTable from '../../widgets/DataTable.svelte';
-  import SystemDetail from '../../forms/SystemDetail.svelte';
   import { onMount } from 'svelte';
   import { Modal } from 'bootstrap';
+  import DataTable from '../../widgets/DataTable.svelte';
+  import SystemDetail from '../../forms/SystemDetail.svelte';
+	import SystemFilters from '../../forms/SystemFilters.svelte';
   
   let modalInstance;
   let systemFormInstance;
@@ -34,6 +35,17 @@
     modalInstance.show();
   }
 
+  const handleSearchFilter = (event) => {
+    const { name, description } = event.detail;
+    systemDataTable.queryParams = {name,description};
+    systemDataTable.list();
+  }
+  
+  const handleCleanFilter= () => {
+    systemDataTable.queryParams = {};
+    systemDataTable.list();
+  }
+
   onMount(() => {
     // montar acciones de la tabla
       // ejemplos
@@ -47,15 +59,23 @@
     // table action buttons
     systemDataTable.actionButtons = [
       {
-        class: 'btn-info',
-        icon: 'fa-eye',
-        label: 'Ver',
+        class: 'btn-secondary',
+        icon: 'fa-list',
+        label: 'Roles y Permisos',
         action: () => {
           alert('ver');
         }
       },
       {
-        class: 'btn-warning',
+        class: 'btn-secondary',
+        icon: 'fa-users',
+        label: 'Usuarios',
+        action: () => {
+          alert('ver');
+        }
+      },
+      {
+        class: 'btn-secondary',
         icon: 'fa-pencil',
         label: 'Editar',
         action: editSystem
@@ -106,27 +126,9 @@
     </div>
   {/if}
   <div class="container">
-    <!-- Formulario de Búsqueda -->
-    <form class="mb-4">
-      <div class="row">
-          <div class="col-md-3">
-              <label for="name" class="form-label">Buscar por Nombre</label>
-              <input type="text" class="form-control" id="name" placeholder="Nombre">
-          </div>
-          <div class="col-md-5">
-              <label for="description" class="form-label">Buscar por Descripción</label>
-              <input type="text" class="form-control" id="description" placeholder="Descripción">
-          </div>
-          <div class="col-md-4 d-flex align-items-end">
-            <button type="submit" class="btn btn-primary me-2">
-              <i class="fa fa-search me-2"></i> Buscar
-            </button>
-            <button type="reset" class="btn btn-secondary">
-              <i class="fa fa-eraser me-2"></i> Limpiar
-            </button>
-          </div>
-      </div>
-    </form>
+    <SystemFilters 
+    on:search={handleSearchFilter} 
+    on:clean={handleCleanFilter} />
   </div>
   <div class="row subtitle-row">
     <h4 class="subtitle">Listado de Sistemas</h4>
@@ -138,6 +140,7 @@
       columnKeys={['id', 'name', 'description']}
       columnTypes={['id', 'td', 'td']}
       columnNames={['ID', 'Nombre', 'Descripción', 'Acciones']}
+      columnStyles={['max-width: 50px;', 'max-width: 250px;', 'max-width: 400px;', 'max-width: 150px;']}
       columnClasses={['d-none', '', '', 'text-end']}
       addButton={{
         display: true,
