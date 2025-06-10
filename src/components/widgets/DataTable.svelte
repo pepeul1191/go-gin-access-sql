@@ -113,6 +113,26 @@
     window.open(href, '_blank');
   }
 
+  const firstPage = () => {
+    pagination.actualPage = 1;
+    list();
+  }
+
+  const previousPage = () => {
+    pagination.actualPage = pagination.actualPage - 1;
+    list();
+  }
+
+  const nextPage = () => {
+    pagination.actualPage = pagination.actualPage + 1;
+    list();
+  }
+
+  const lastPage = () => {
+    pagination.actualPage = pagination.totalPages;
+    list();
+  }
+
   export const list = () => {
     // if pagation, add query params
     if(pagination.display){
@@ -280,36 +300,36 @@
           <div class="d-flex justify-content-between align-items-center">
             <!-- Texto con el rango de filas mostradas (izquierda) -->
             <div class="text-left">
-              <span>Página 1 de {pagination.totalPages} - Mostrando filas {pagination.offset}-{pagination.limit} de {pagination.total}</span>
+              <span>Página {pagination.actualPage} de {pagination.totalPages} - Mostrando filas {pagination.offset}-{pagination.limit} de {pagination.total}</span>
             </div>
             <!-- Paginación (derecha) -->
             <nav aria-label="Page navigation">
               <ul class="pagination mb-0">
                 <!-- Página Primero -->
-                <li class="page-item disabled">
-                  <a class="page-link" href="#" tabindex="-1">
+                <li class="page-item">
+                  <button class="page-link {pagination.actualPage === 1 ? 'disabled' : ''}" type="button" tabindex="-1" on:click={firstPage} disabled={pagination.actualPage === 1}>
                     <i class="fa fa-angle-double-left"></i> Primero
-                  </a>
+                  </button>
                 </li>
                 <!-- Página Anterior -->
-                <li class="page-item disabled">
-                  <a class="page-link" href="#" tabindex="-1">
+                <li class="page-item">
+                  <button class="page-link {pagination.actualPage === 1 ? 'disabled' : ''}" type="button" tabindex="-1" on:click={previousPage} disabled={pagination.actualPage === 1}>
                     <i class="fa fa-angle-left"></i> Anterior
-                  </a>
+                  </button>
                 </li>
                 <!-- Página Siguiente -->
                 <li class="page-item">
-                  <a class="page-link" href="#">
+                  <button class="page-link {pagination.actualPage === pagination.totalPages ? 'disabled' : ''}" type="button" on:click={nextPage} disabled={pagination.actualPage === pagination.totalPages}>
                     Siguiente <i class="fa fa-angle-right"></i>
-                  </a>
+                  </button>
                 </li>
                 <!-- Página Último -->
                 <li class="page-item">
-                  <a class="page-link" href="#">
+                  <button class="page-link {pagination.actualPage === pagination.totalPages ? 'disabled' : ''}" type="button" on:click={lastPage} disabled={pagination.actualPage === pagination.totalPages}>
                     Último <i class="fa fa-angle-double-right"></i>
-                  </a>
+                  </button>
                 </li>
-              </ul>
+              </ul>              
             </nav>
           </div>
         </td>

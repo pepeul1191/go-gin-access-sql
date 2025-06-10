@@ -149,7 +149,7 @@
       }}
       pagination = {{
         display: true,
-        step: 10,
+        step: 5,
         totalPages: 0,
         actualPage: 1
       }}
