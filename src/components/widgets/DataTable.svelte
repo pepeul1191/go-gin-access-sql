@@ -45,7 +45,8 @@
   onMount(() => {
     list();
     deleteConfirmationInstance = new Modal(deleteConfirmationModal);
-    console.log(addButton)
+    //console.log(addButton)
+    console.log(pagination)
   });
 
   export const askToDeleteRow = (record, key) => {
@@ -134,7 +135,7 @@
   }
 
   const handleStepChange = (event) => {
-    pagination.step = event.target.value;
+    pagination.step = +event.target.value;
     pagination.actualPage = 1;
     pagination.offset = 0;
     list();
@@ -162,8 +163,8 @@
           data = response.data.list;
           pagination.totalPages = response.data.pages;
           pagination.offset = response.data.offset + 1;
-          pagination.limit = pagination.offset * pagination.actualPage + pagination.step - 1; 
           pagination.total = response.data.total;
+          pagination.limit = pagination.offset + pagination.step - 1 > pagination.total ? pagination.total : pagination.offset + pagination.step - 1; 
         }else{
           data = response.data;
         }
@@ -239,11 +240,11 @@
     {#if pagination.display}
       <label for="rows-per-page" class="form-label mb-0 me-2">Filas por página:</label>
       <select class="form-select" id="rows-per-page" style="width: 120px;" bind:value={pagination.step} on:change={handleStepChange}>
-        <option value="5">5</option>
-        <option value="10" selected>10</option>
-        <option value="25">25</option>
-        <option value="50">50</option>
-        <option value="100">100</option>
+        <option value={5}>5</option>
+        <option value={10}>10</option>
+        <option value={25}>25</option>
+        <option value={50}>50</option>
+        <option value={100}>100</option>
       </select>
     {/if}
   </div>
