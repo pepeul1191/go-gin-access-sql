@@ -133,6 +133,13 @@
     list();
   }
 
+  const handleStepChange = (event) => {
+    pagination.step = event.target.value;
+    pagination.actualPage = 1;
+    pagination.offset = 0;
+    list();
+  }
+
   export const list = () => {
     // if pagation, add query params
     if(pagination.display){
@@ -231,7 +238,7 @@
   <div class="d-flex align-items-center me-3">
     {#if pagination.display}
       <label for="rows-per-page" class="form-label mb-0 me-2">Filas por página:</label>
-      <select class="form-select" id="rows-per-page" style="width: 120px;" bind:value={pagination.step}>
+      <select class="form-select" id="rows-per-page" style="width: 120px;" bind:value={pagination.step} on:change={handleStepChange}>
         <option value="5">5</option>
         <option value="10" selected>10</option>
         <option value="25">25</option>
