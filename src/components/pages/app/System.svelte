@@ -147,11 +147,11 @@
         disabled: false,
         action: addSystem
       }}
-      pagnation = {{
+      pagination = {{
         display: true,
         step: 10,
         totalPages: 0,
-        actualPage: 0
+        actualPage: 1
       }}
       actionButtons={[]} 
     />

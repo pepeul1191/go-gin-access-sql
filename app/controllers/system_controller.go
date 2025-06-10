@@ -4,7 +4,9 @@ package controllers
 import (
 	"access/app/configs"
 	"access/app/models"
+	"math"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -13,9 +15,12 @@ import (
 // GET: apis/v1/systems
 func SystemFetchAll(c *gin.Context) {
 	var systems []models.System
+	var total int64
 	// Obtener parámetros opcionales
 	name := c.Query("name")
 	description := c.Query("description")
+	step := c.Query("step")
+	page := c.Query("page")
 	// Conexión a la base de datos
 	if err := configs.ConnectToDB(); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -33,16 +38,56 @@ func SystemFetchAll(c *gin.Context) {
 	if description != "" {
 		query = query.Where("description LIKE ?", "%"+description+"%")
 	}
-	// Ejecutar la consulta
-	if err := query.Find(&systems).Error; err != nil {
+	// Paginación (si step y page están presentes)
+	if step != "" && page != "" {
+		// Contar total (antes de paginar)
+		if err := query.Count(&total).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error":   "Error al contar systems",
+				"message": err.Error(),
+			})
+			return
+		}
+		// traer pagina
+		stepInt, err1 := strconv.Atoi(step)
+		pageInt, err2 := strconv.Atoi(page)
+		if err1 == nil && err2 == nil && stepInt > 0 && pageInt > 0 {
+			offset := (pageInt - 1) * stepInt
+			query = query.Offset(offset).Limit(stepInt)
+			// Ejecutar la consulta
+			if err := query.Find(&systems).Error; err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{
+					"error":   "Error al listar la lista paginada de sistemas",
+					"message": err.Error(),
+				})
+				return
+			}
+			// Respuesta
+			pages := int(math.Ceil(float64(total) / float64(stepInt)))
+			c.JSON(http.StatusOK, gin.H{
+				"list":   systems,
+				"pages":  pages,
+				"total":  total,
+				"offset": offset,
+			})
+		}
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"error":   "Error al consultar systems",
-			"message": err.Error(),
+			"error":   "Error al leer los parametros de la paginación",
+			"message": err1.Error(),
 		})
 		return
+	} else {
+		// Ejecutar la consulta
+		if err := query.Find(&systems).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error":   "Error al consultar systems",
+				"message": err.Error(),
+			})
+			return
+		}
+		// Respuesta
+		c.JSON(http.StatusOK, systems)
 	}
-	// Respuesta
-	c.JSON(http.StatusOK, systems)
 }
 
 // POST: /apis/v1/systems

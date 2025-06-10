@@ -16,6 +16,11 @@ GET {{baseUrl}}/apis/v1/systems
 Accept: application/json
 Cookie: {{session}}
 
+### Obtener usuarios - paginación
+GET {{baseUrl}}/apis/v1/systems?step=10&page=2
+Accept: application/json
+Cookie: {{session}}
+
 ### Crear post
 POST {{baseUrl}}/posts
 Content-Type: application/json

@@ -24,7 +24,7 @@
     action: () => {},
   };
   export let actionButtons = [];
-  export let pagnation = {
+  export let pagination = {
     display: false,
     step: 10,
     totalPages: 0,
@@ -114,6 +114,11 @@
   }
 
   export const list = () => {
+    // if pagation, add query params
+    if(pagination.display){
+      queryParams.step = pagination.step;
+      queryParams.page = pagination.actualPage;
+    }
     if(fetchURL){
       axios.get( // url, data, headers
         fetchURL, 
@@ -126,7 +131,15 @@
       )
       .then(function (response) {
         data = [];
-        data = response.data;
+        if(pagination.display){
+          data = response.data.list;
+          pagination.totalPages = response.data.pages;
+          pagination.offset = response.data.offset + 1;
+          pagination.limit = pagination.offset * pagination.actualPage + pagination.step - 1; 
+          pagination.total = response.data.total;
+        }else{
+          data = response.data;
+        }
       })
       .catch(function (error) {
         console.error(error);
@@ -196,13 +209,14 @@
 <div class="d-flex justify-content-between align-items-center">
   <!-- Parte izquierda: Filtro de filas por página -->
   <div class="d-flex align-items-center me-3">
-    {#if pagnation.display}
+    {#if pagination.display}
       <label for="rows-per-page" class="form-label mb-0 me-2">Filas por página:</label>
-      <select class="form-select" id="rows-per-page" style="width: 120px;">
+      <select class="form-select" id="rows-per-page" style="width: 120px;" bind:value={pagination.step}>
         <option value="5">5</option>
-        <option value="10">10</option>
-        <option value="15">15</option>
-        <option value="20">20</option>
+        <option value="10" selected>10</option>
+        <option value="25">25</option>
+        <option value="50">50</option>
+        <option value="100">100</option>
       </select>
     {/if}
   </div>
@@ -259,14 +273,14 @@
     </tr>
     {/each}
     </tbody>
-  {#if pagnation.display}
+  {#if pagination.display}
     <tfoot>
       <tr>
         <td colspan="6">
           <div class="d-flex justify-content-between align-items-center">
             <!-- Texto con el rango de filas mostradas (izquierda) -->
             <div class="text-left">
-              <span>Página 1 de 10 - Mostrando filas 1-10 de 100</span>
+              <span>Página 1 de {pagination.totalPages} - Mostrando filas {pagination.offset}-{pagination.limit} de {pagination.total}</span>
             </div>
             <!-- Paginación (derecha) -->
             <nav aria-label="Page navigation">
