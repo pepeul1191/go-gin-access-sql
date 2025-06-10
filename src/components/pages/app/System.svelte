@@ -8,7 +8,10 @@
   let modalInstance;
   let systemFormInstance;
   let systemDetailModal;
-  let message = null;
+  let alertMessage = {
+    text: '',
+    status: '',
+  };
   let systemDataTable;
   let modalTitle;
 
@@ -44,6 +47,16 @@
   const handleCleanFilter= () => {
     systemDataTable.queryParams = {};
     systemDataTable.list();
+  }
+
+  const handleTableAlert = (callback) => { 
+    alertMessage = callback.detail;
+    setTimeout(() => {
+      alertMessage = {
+        text: '',
+        status: '',
+      };
+    }, 4300);
   }
 
   onMount(() => {
@@ -120,9 +133,9 @@
   <div class="row subtitle-row">
     <h4 class="subtitle">Filtros de Búsqueda</h4>
   </div>
-  {#if message}
-    <div class="alert alert-{message.status}" role="alert">
-      {message.text}
+  {#if alertMessage.text != ''}
+    <div class="alert alert-{alertMessage.status}" role="alert">
+      {alertMessage.text}
     </div>
   {/if}
   <div class="container">
@@ -142,6 +155,14 @@
       columnNames={['ID', 'Nombre', 'Descripción', 'Acciones']}
       columnStyles={['max-width: 50px;', 'max-width: 250px;', 'max-width: 400px;', 'max-width: 150px;']}
       columnClasses={['d-none', '', '', 'text-end']}
+      messages = {{
+        success: 'Datos actualizados', 
+        errorNetwork: 'No se pudo listar los sistemas. No hay conexión con el servidor.',
+        notFound: 'No se pudo listar los sistemas. Recurso no encontrado.',
+        serverError:'No se pudo listar los sistemas. Error interno del servidor',
+        requestError: 'No se pudo listar los sistemas. No se recibió respuesta del servidor',
+        otherError: 'No se pudo listar los sistemas. Ocurrió un error no esperado al traer los datos del servidor',
+      }}
       addButton={{
         display: true,
         disabled: false,
@@ -154,6 +175,7 @@
         actualPage: 1
       }}
       actionButtons={[]} 
+      on:alert={handleTableAlert}
     />
   </div>
 </div>

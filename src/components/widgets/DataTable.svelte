@@ -1,6 +1,6 @@
 <svelte:options accessors={true} />
 <script>
-  import { onMount } from 'svelte';
+  import { onMount, createEventDispatcher } from 'svelte';
   import axios from 'axios';
   import { Modal } from 'bootstrap';
   import { navigate } from 'svelte-routing';
@@ -31,6 +31,14 @@
     actualPage: 0
   };
   export let queryParams = {}
+  export let messages = {
+    success: 'Datos actualizados', 
+    errorNetwork: 'No hay conexión con el servidor',
+    notFound: 'Recurso no encontrado',
+    serverError:'Error interno del servidor',
+    requestError: 'No se recibió respuesta del servidor',
+    otherError: 'Ocurrió un error no esperado al traer los datos del servidor',
+  };
 
   // delete confirmation modal
   let deleteConfirmationInstance;
@@ -41,6 +49,8 @@
   };
   let idForDeleting = null;
   let btnDisabledDeleteConfirmation = false;
+  // dispatch
+  const dispatch = createEventDispatcher();
 
   onMount(() => {
     list();
@@ -171,9 +181,50 @@
       })
       .catch(function (error) {
         console.error(error);
+        if(error.code == "ERR_NETWORK"){
+          dispatch('alert', { 
+            text: messages.errorNetwork,
+            status: 'danger'
+          });
+        }else if (error.response) {
+          // El servidor respondió con un código de estado fuera del rango 2xx
+          const status = error.response.status;
+          switch (status) {
+            case 404:
+              dispatch('alert', {
+                text: messages.notFound,
+                status: 'warning'
+              });
+              break;
+            case 500:
+              dispatch('alert', {
+                text: messages.serverError,
+                status: 'danger'
+              });
+              break;
+            default:
+              dispatch('alert', {
+                text: `Error HTTP: ${status}`,
+                status: 'danger'
+              });
+              break;
+          }
+        } else if (error.request) {
+          // La solicitud fue hecha pero no hubo respuesta
+          dispatch('alert', {
+            text: messages.requestError,
+            status: 'danger'
+          });
+        } else {
+          // Otro tipo de error
+          dispatch('alert', {
+            text: messages.otherError,
+            status: 'danger'
+          });
+        }
       })
       .then(function () {
-        
+        // TODO
       });
     }else{
       console.error('No hay URL para traer datos');
