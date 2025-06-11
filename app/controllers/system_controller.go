@@ -4,6 +4,7 @@ package controllers
 import (
 	"access/app/configs"
 	"access/app/models"
+	"fmt"
 	"math"
 	"net/http"
 	"strconv"
@@ -170,4 +171,34 @@ func SystemDelete(c *gin.Context) {
 		"message": "Sistema eliminado correctamente",
 		"id":      id,
 	})
+}
+
+// GET: apis/v1/systems/:id/roles
+func SystemFetchRoles(c *gin.Context) {
+	var roles []models.Role
+	idStr := c.Param("id")
+	// Convertir el ID a uint (puedes usar strconv.ParseUint si prefieres)
+	var systemID uint
+	if _, err := fmt.Sscanf(idStr, "%d", &systemID); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "ID de sistema inválido",
+		})
+		return
+	}
+	// Conexión a la base de datos
+	if err := configs.DB.Where("system_id = ?", systemID).Find(&roles).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error":   "Error al obtener los roles",
+			"message": err.Error(),
+		})
+		return
+	}
+	// Respuesta
+	// Si no se encontraron roles, devolver arreglo vacío
+	if len(roles) == 0 {
+		c.JSON(http.StatusOK, []struct{}{})
+		return
+	}
+	// Devolver respuesta exitosa
+	c.JSON(http.StatusOK, roles)
 }

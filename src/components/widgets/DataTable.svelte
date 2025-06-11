@@ -4,7 +4,10 @@
   import axios from 'axios';
   import { Modal } from 'bootstrap';
   import { navigate } from 'svelte-routing';
+  import random from '../../helpers/random.js';
 
+  export let recordId = 'id';
+  export let observer = { new: [], edit: [], delete: []};
   export let fetchURL = null;
   export let deleteURL = fetchURL;
   export let data = [];
@@ -53,7 +56,7 @@
   const dispatch = createEventDispatcher();
 
   onMount(() => {
-    list();
+    // list();
     deleteConfirmationInstance = new Modal(deleteConfirmationModal);
     //console.log(addButton)
     console.log(pagination)
@@ -109,8 +112,51 @@
   }
 
   export const addRow = () => {
-    alert('addRow');
+    let tmp = {}
+    for(const key in columnKeys){
+      if(columnKeys[key] == 'id' || columnKeys[key]=='_id'){
+        tmp[columnKeys[key]] = `tmp_${random(10)}`;;
+      }else{
+        tmp[columnKeys[key]] = '';
+      }
+    }
+    data.push(tmp)
+    data = data
   }
+
+  export const deleteRow = (record, keyId) => {
+    let idToRemove = record[keyId];
+    // remove from observers new and edit y agregarlo a delete
+    if(observer.new.includes(idToRemove)){
+      observer.new = observer.new.filter(u => u !== idToRemove);
+    }
+    if(observer.edit.includes(idToRemove)){
+      observer.edit = observer.edit.filter(u => u !== idToRemove);
+    }
+    if(!observer.delete.includes(idToRemove)){
+      observer.delete.push(idToRemove)
+    }
+    // remove from data
+    console.log(data)
+    data = data.filter(item => item[keyId] !== idToRemove);
+    console.log(data)
+  }
+
+  const inputTextKeyDown = (event) => {
+    //console.log(event.target)
+    var rowKey = event.target.parentElement.parentElement.firstChild.innerHTML;
+    //console.log(rowKey)
+    if(String(rowKey).includes('tmp')){
+      if(!observer.new.includes(rowKey)){
+        observer.new.push(rowKey)
+      }
+    }else{
+      if(!observer.edit.includes(rowKey)){
+        observer.edit.push(rowKey)
+      }
+    }
+    console.log(observer)
+  };
 
   export const goToLink = (href) => {
     navigate(href)
@@ -241,20 +287,17 @@
     border-radius: 0px !important;
   }
 
-  .tfoot > tr > td {
-    padding-left: 0px !important;
-  }
-
-  span.page-link{
-    color: #343434 !important;
-  }
-
   .page-item{
     margin-left: 0px;
   }
 
   .text-end > .btn{
     margin-left: 5px;
+  }
+
+  .data-td > input[type="text"]{
+    border-color: transparent;
+    background-color: transparent;
   }
 </style>
 <!-- modal -->
@@ -334,7 +377,13 @@
     {#each data as record}
     <tr>
       {#each columnKeys as key, i}
-        <td class="{columnClasses[i]}" style="{columnStyles[i]}">{record[key]}</td>
+        <td class="data-td {columnClasses[i]}" style="{columnStyles[i]}">
+          {#if columnTypes[i] == 'input[text]'}
+            <input type="text" key="{key}" on:keydown={inputTextKeyDown} bind:value={record[key]} />
+          {:else} <!-- if columnTypes[i] == 'td'} -->
+            {record[key]}
+          {/if}
+        </td>
       {/each}
       {#if actionButtons.length > 0}
         <td class="text-end" styles="">

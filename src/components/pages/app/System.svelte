@@ -4,8 +4,9 @@
   import DataTable from '../../widgets/DataTable.svelte';
   import SystemDetail from '../../forms/SystemDetail.svelte';
 	import SystemFilters from '../../forms/SystemFilters.svelte';
+	import RolePermission from '../../forms/RolePermission.svelte';
   
-  let modalInstance;
+  let systemDetailModalInstance;
   let systemFormInstance;
   let systemDetailModal;
   let alertMessage = {
@@ -15,10 +16,14 @@
   let systemDataTable;
   let modalTitle;
 
+  let rolePermissionModalInstance;
+  let rolePermissionModal;
+  let rolePermissionFormInstance;
+
   const addSystem = () => {
     modalTitle = 'Agregar Sistema'
     systemFormInstance.clean();
-    modalInstance.show();
+    systemDetailModalInstance.show();
   }
 
   const handleClose = () => {
@@ -28,14 +33,22 @@
 
   const handleFormSave = (event) => {
     systemDataTable.list();
-    modalInstance.hide();
+    systemDetailModalInstance.hide();
   };
 
   const editSystem = (system) => {
     modalTitle = 'Editar Sistema'
     systemFormInstance.clean();
     systemFormInstance.loadSystem(system);
-    modalInstance.show();
+    systemDetailModalInstance.show();
+  }
+
+  const rolesAndPermission = (system) => {
+    modalTitle = 'Gestión de Roles y Permisos del Sistema ' + system.name
+    //systemFormInstance.clean();
+    //systemFormInstance.loadSystem(system);
+    rolePermissionModalInstance.show();
+    rolePermissionFormInstance.setSystemId(system);
   }
 
   const handleSearchFilter = (event) => {
@@ -59,6 +72,10 @@
     }, 4300);
   }
 
+  const handleRolePermissionSave = (event) => {
+
+  }
+
   onMount(() => {
     // montar acciones de la tabla
       // ejemplos
@@ -67,17 +84,17 @@
       //systemDataTable.addButton.action = () => systemDataTable.goToHref(BASE_URL + 'hola');
       //systemDataTable.addButton.action = () => systemDataTable.openTab(BASE_URL + 'hola');
     
-    modalInstance = new Modal(systemDetailModal);
+    systemDetailModalInstance = new Modal(systemDetailModal);
+    rolePermissionModalInstance = new Modal(rolePermissionModal);
     systemDetailModal.addEventListener('hidden.bs.modal', handleClose);
+    rolePermissionModal.addEventListener('hidden.bs.modal', () => {});
     // table action buttons
     systemDataTable.actionButtons = [
       {
         class: 'btn-secondary',
         icon: 'fa-list',
         label: 'Roles y Permisos',
-        action: () => {
-          alert('ver');
-        }
+        action: rolesAndPermission
       },
       {
         class: 'btn-secondary',
@@ -102,6 +119,7 @@
         }
       },
     ];
+    systemDataTable.list();
   });
 </script>
 
@@ -120,6 +138,22 @@
         <SystemDetail 
           bind:this={systemFormInstance} 
           on:saved={handleFormSave} />
+      </div>
+    </div>
+  </div>
+</div>
+
+<div bind:this={rolePermissionModal} class="modal fade" tabindex="-1">
+  <div class="modal-dialog modal-xl modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">{modalTitle}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        <RolePermission 
+          bind:this={rolePermissionFormInstance} 
+          on:saved={handleRolePermissionSave} />
       </div>
     </div>
   </div>

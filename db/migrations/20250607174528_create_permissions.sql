@@ -3,7 +3,6 @@
 CREATE TABLE permissions (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   name VARCHAR(40) NOT NULL,
-  description TEXT,
   created DATETIME NOT NULL,
   updated DATETIME NOT NULL,
   role_id INTEGER NOT NULL,
