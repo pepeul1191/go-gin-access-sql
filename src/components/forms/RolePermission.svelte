@@ -41,6 +41,15 @@
     // table action buttons
     rolePermissionDataTable.actionButtons = [
       {
+        class: 'btn-secondary',
+        icon: 'fa-list',
+        label: 'Permisos',
+        action: (record) => {
+          //systemDataTable.askToDeleteRow(record, 'id');
+          //console.log(record);
+        }
+      },
+      {
         class: 'btn-danger',
         icon: 'fa-trash',
         label: 'Eliminar',
@@ -84,6 +93,11 @@
         otherError: 'No se pudo listar los roles del sistema. Ocurrió un error no esperado al traer los datos del servidor',
       }}
       addButton={{
+        display: true,
+        disabled: false,
+        action: null
+      }}
+      saveButton={{
         display: true,
         disabled: false,
         action: null
