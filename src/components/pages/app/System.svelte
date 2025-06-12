@@ -174,8 +174,8 @@
   {/if}
   <div class="container">
     <SystemFilters 
-    on:search={handleSearchFilter} 
-    on:clean={handleCleanFilter} />
+      on:search={handleSearchFilter} 
+      on:clean={handleCleanFilter} />
   </div>
   <div class="row subtitle-row">
     <h4 class="subtitle">Listado de Sistemas</h4>

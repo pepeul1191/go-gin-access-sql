@@ -19,6 +19,7 @@
     systemId = system.id;
     rolesDataTable.fetchURL = BASE_URL + 'apis/v1/systems/' + systemId + '/roles';
     rolesDataTable.list();
+    displayPermission = false;
   }
 
   const addRole = () => {
@@ -66,6 +67,9 @@
           //systemDataTable.askToDeleteRow(record, 'id');
           //console.log(record);
           rolesDataTable.deleteRow(record, 'id');
+          if(record.id == roleId){
+            displayPermission = false;
+          }
         }
       },
     ];
