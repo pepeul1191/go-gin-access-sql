@@ -12,3 +12,15 @@ type Role struct {
 	SystemID uint      `gorm:"not null" json:"system_id"`                   // Hace referencia a System.ID
 	System   System    `gorm:"foreignKey:SystemID" json:"system,omitempty"` // Relación con System
 }
+
+type RoleCreateRequest struct {
+	News    []IncomingRole         `json:"news"`
+	Edits   []Role                 `json:"edits"` // o puedes ignorar si no las usas aún
+	Deletes []uint                 `json:"deletes"`
+	Extra   map[string]interface{} `json:"extra"`
+}
+
+type IncomingRole struct {
+	ID   string `json:"id"` // tmp_...
+	Name string `json:"name"`
+}

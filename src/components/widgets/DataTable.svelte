@@ -9,6 +9,7 @@
   export let recordId = 'id';
   export let observer = { new: [], edit: [], delete: []};
   export let fetchURL = null;
+  export let saveURL = fetchURL;
   export let deleteURL = fetchURL;
   export let data = [];
   export let columnKeys = [];
@@ -26,6 +27,8 @@
     disabled: false,
     action: () => {},
   };
+  export let extraData = {}
+  let extraReplace = [];
   export let actionButtons = [];
   export let pagination = {
     display: false,
@@ -137,9 +140,7 @@
       observer.delete.push(idToRemove)
     }
     // remove from data
-    console.log(data)
     data = data.filter(item => item[keyId] !== idToRemove);
-    console.log(data)
   }
 
   const inputTextKeyDown = (event) => {
@@ -155,7 +156,97 @@
         observer.edit.push(rowKey)
       }
     }
-    console.log(observer)
+    //console.log(observer)
+  };
+
+  const dataSearch = (key, idSearched) => {
+    for (var i=0; i < data.length; i++) {
+      if (data[i][key] == idSearched) {
+        return data[i];
+      }
+    }
+  }
+
+  const saveChanges = (event) => {
+    console.log(observer);
+    console.log(data);
+    var dataToSend = {new:[], edit:[], delete:[]};
+    // search in observers what data will send
+    observer.new.forEach((id) => {
+      dataToSend.new.push(data.find(record => record[recordId] == id));
+    });
+    observer.edit.forEach((id) => {
+      dataToSend.edit.push(data.find(record => record[recordId] == id));
+    });
+    observer.delete.forEach((id) => {
+      dataToSend.delete.push(id);
+    });
+    // send 
+    if(dataToSend.new.length == 0 && dataToSend.edit.length == 0 && dataToSend.delete.length == 0){
+      dispatch('alert', { 
+        text: 'No se han registrados cambios',
+        status: 'warning'
+      });
+    }else{
+      console.log(dataToSend)
+      axios.post(saveURL, {
+          news: dataToSend.new,
+          edits: dataToSend.edit,
+          deletes: dataToSend.delete,
+          extra: extraData,
+        }, {
+          headers: {
+            'Content-Type': 'application/json',
+            //[CSRF.key]: CSRF.value,
+          }
+        })
+        .then(function (response) {
+          // console.log(extraReplace)
+          response.data.forEach(created => {
+            /*if(extraReplace.length != 0){
+              extraReplace.forEach(value => {
+                dataSearch(recordId, created.tmp)[value] = created[value];
+              })
+            }*/
+            dataSearch(recordId, created.tmp)[recordId] = created[recordId];
+          });
+          data = data;
+          observer = { new: [], edit: [], delete: []};
+          observer = observer
+          dispatch('alert', { 
+            text: messages.success,
+            status: 'success'
+          });
+        })
+        .catch(function (error) {
+          console.error(error);
+          if (error.response) {
+            if(error.response.status == 404){
+              launchAlert({
+                message: messages.save404,
+                type: 'danger',
+                timeOut: 5000
+              });
+            }else if(error.response.status == 501){
+              launchAlert({
+                message: error.response.data,
+                type: 'danger',
+                timeOut: 5000
+              });
+            }else{
+              launchAlert({
+                message: messages.save500,
+                type: 'danger',
+                timeOut: 5000
+              });
+            }
+            console.log(error.response.data);
+            console.log(error.response.status);
+            // console.log(error.response.headers);
+          }
+        }
+      );
+    }
   };
 
   export const goToLink = (href) => {
@@ -359,7 +450,7 @@
       </button>
     {/if}
     {#if saveButton.display}
-      <button class="btn btn-success d-flex align-items-center">
+      <button class="btn btn-success d-flex align-items-center" on:click={saveChanges}>
         <i class="fa fa-check me-2"></i> Guardar Cambios
       </button>
     {/if}

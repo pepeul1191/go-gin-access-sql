@@ -23,6 +23,7 @@
 
   const handleTableAlert = (callback) => { 
     alertMessage = callback.detail;
+    console.log(callback.detail)
     setTimeout(() => {
       alertMessage = {
         text: '',
@@ -79,6 +80,7 @@
     <DataTable 
       bind:this={rolePermissionDataTable}
       fetchURL={BASE_URL + 'apis/v1/systems/' + systemId + '/roles'}
+      saveURL={BASE_URL + 'apis/v1/roles/' + systemId}
       columnKeys={['id', 'name', ]}
       columnTypes={['id', 'input[text]', ]}
       columnNames={['ID', 'Nombre', 'Acciones']}

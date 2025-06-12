@@ -24,6 +24,8 @@ func setupRoutes(r *gin.Engine) {
 	r.PUT("/apis/v1/systems", configs.APIAuthRequired(), controllers.SystemUpdate)
 	r.DELETE("/apis/v1/systems/:id", configs.APIAuthRequired(), controllers.SystemDelete)
 	r.GET("/apis/v1/systems/:id/roles", configs.APIAuthRequired(), controllers.SystemFetchRoles)
+	// roles controller
+	r.POST("/apis/v1/roles/:system-id", configs.APIAuthRequired(), controllers.SaveRoles)
 	// error controller
 	r.NoRoute(controllers.Error404)
 }
