@@ -18,20 +18,23 @@ func SaveRoles(c *gin.Context) {
 	// Convertir el ID del sistema
 	var systemID uint
 	if _, err := fmt.Sscanf(systemIdStr, "%d", &systemID); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "ID de sistema inválido"})
+		c.JSON(http.StatusBadRequest, gin.H{"message": "ID de sistema inválido", "error": err.Error()})
 		return
 	}
 
 	// Leer JSON del cuerpo
 	var req models.RoleCreateRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"message": "No se pueden parsear los datos enviados", "error": err.Error()})
 		return
 	}
 
-	// Verificar conexión a la base de datos
-	if configs.DB == nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Conexión a DB no disponible"})
+	// Conexión a la base de datos
+	if err := configs.ConnectToDB(); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error":   "No se pudo conectar a la base de datos",
+			"message": err.Error(),
+		})
 		return
 	}
 
@@ -43,7 +46,7 @@ func SaveRoles(c *gin.Context) {
 		}
 	}()
 
-	var response []map[string]string
+	response := make([]models.CreatedRoleResponse, 0)
 
 	// 1. Crear nuevos roles
 	for _, incoming := range req.News {
@@ -56,13 +59,13 @@ func SaveRoles(c *gin.Context) {
 
 		if err := tx.Create(&newRole).Error; err != nil {
 			tx.Rollback()
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Error al crear rol", "message": err.Error()})
+			c.JSON(http.StatusInternalServerError, gin.H{"message": "Error al crear rol", "error": err.Error()})
 			return
 		}
 
-		response = append(response, map[string]string{
-			"tmp": incoming.ID,
-			"id":  strconv.Itoa(int(newRole.ID)),
+		response = append(response, models.CreatedRoleResponse{
+			Tmp: incoming.ID,
+			ID:  strconv.Itoa(int(newRole.ID)),
 		})
 	}
 
@@ -71,7 +74,7 @@ func SaveRoles(c *gin.Context) {
 		var role models.Role
 		if err := tx.First(&role, uint(incoming.ID)).Error; err != nil {
 			tx.Rollback()
-			c.JSON(http.StatusNotFound, gin.H{"error": "Rol no encontrado", "id": incoming.ID})
+			c.JSON(http.StatusNotFound, gin.H{"message": "Rol no encontrado", "id": incoming.ID})
 			return
 		}
 
@@ -80,7 +83,7 @@ func SaveRoles(c *gin.Context) {
 
 		if err := tx.Model(&role).Select("Name", "Updated").Updates(role).Error; err != nil {
 			tx.Rollback()
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Error al actualizar rol", "id": incoming.ID, "message": err.Error()})
+			c.JSON(http.StatusInternalServerError, gin.H{"message": "Error al actualizar rol", "id": incoming.ID, "error": err.Error()})
 			return
 		}
 	}
@@ -90,25 +93,23 @@ func SaveRoles(c *gin.Context) {
 		var role models.Role
 		if err := tx.First(&role, uint(idToDelete)).Error; err != nil {
 			tx.Rollback()
-			c.JSON(http.StatusNotFound, gin.H{"error": "Rol no encontrado", "id": idToDelete})
+			c.JSON(http.StatusNotFound, gin.H{"message": "Rol no encontrado", "id": idToDelete})
 			return
 		}
 
 		if err := tx.Delete(&role).Error; err != nil {
 			tx.Rollback()
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Error al eliminar rol", "message": err.Error()})
+			c.JSON(http.StatusInternalServerError, gin.H{"message": "Error al eliminar rol", "error": err.Error()})
 			return
 		}
 	}
 
 	// Confirmar transacción
 	if err := tx.Commit().Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error al confirmar cambios", "message": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Error al confirmar cambios", "error": err.Error()})
 		return
 	}
 
 	// Responder con éxito
-	c.JSON(http.StatusOK, gin.H{
-		"created": response,
-	})
+	c.JSON(http.StatusOK, response)
 }

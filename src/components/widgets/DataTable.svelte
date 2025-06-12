@@ -136,7 +136,7 @@
     if(observer.edit.includes(idToRemove)){
       observer.edit = observer.edit.filter(u => u !== idToRemove);
     }
-    if(!observer.delete.includes(idToRemove)){
+    if(!observer.delete.includes(idToRemove) && !idToRemove.toString().includes('tmp')){ // only if no new (tmp_....)
       observer.delete.push(idToRemove)
     }
     // remove from data
@@ -188,7 +188,7 @@
         status: 'warning'
       });
     }else{
-      console.log(dataToSend)
+      // console.log(dataToSend)
       axios.post(saveURL, {
           news: dataToSend.new,
           edits: dataToSend.edit,
@@ -208,11 +208,13 @@
                 dataSearch(recordId, created.tmp)[value] = created[value];
               })
             }*/
-            dataSearch(recordId, created.tmp)[recordId] = created[recordId];
+            const newId = created[recordId];
+            const parsedValue = /^\d+$/.test(newId) ? parseInt(newId, 10) : newId;
+            dataSearch(recordId, created.tmp)[recordId] = parsedValue;
           });
           data = data;
           observer = { new: [], edit: [], delete: []};
-          observer = observer
+          observer = observer;
           dispatch('alert', { 
             text: messages.success,
             status: 'success'
@@ -221,27 +223,24 @@
         .catch(function (error) {
           console.error(error);
           if (error.response) {
-            if(error.response.status == 404){
-              launchAlert({
-                message: messages.save404,
-                type: 'danger',
-                timeOut: 5000
+            if(error.status == 404){
+              dispatch('alert', { 
+                text: error.response.data.message,
+                status: 'danger'
               });
-            }else if(error.response.status == 501){
-              launchAlert({
-                message: error.response.data,
-                type: 'danger',
-                timeOut: 5000
+            }else if(error.status == 501){
+              dispatch('alert', { 
+                text: error.response.data.message,
+                status: 'danger'
               });
             }else{
-              launchAlert({
-                message: messages.save500,
-                type: 'danger',
-                timeOut: 5000
+              dispatch('alert', { 
+                text: error.response.data.message,
+                status: 'danger'
               });
             }
             console.log(error.response.data);
-            console.log(error.response.status);
+            console.log(error.status);
             // console.log(error.response.headers);
           }
         }

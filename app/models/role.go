@@ -24,3 +24,8 @@ type IncomingRole struct {
 	ID   string `json:"id"` // tmp_...
 	Name string `json:"name"`
 }
+
+type CreatedRoleResponse struct {
+	Tmp string `json:"tmp"`
+	ID  string `json:"id"`
+}
