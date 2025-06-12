@@ -3,22 +3,26 @@
   import DataTable from '../widgets/DataTable.svelte';
 
   export let systemId = null;
+  let roleId = null;
+  let permissionId = null;
 
   let alertMessage = {
     text: '',
     status: ''
   };
-  let rolePermissionDataTable;
+  let rolesDataTable;
+  let permissionsDataTable;
+  let displayPermission = false;
 
   export const setSystemId = (system) => {
     console.log(system)
     systemId = system.id;
-    rolePermissionDataTable.fetchURL = BASE_URL + 'apis/v1/systems/' + systemId + '/roles';
-    rolePermissionDataTable.list();
+    rolesDataTable.fetchURL = BASE_URL + 'apis/v1/systems/' + systemId + '/roles';
+    rolesDataTable.list();
   }
 
   const addRole = () => {
-    rolePermissionDataTable.addRow();
+    rolesDataTable.addRow();
   }
 
   const handleTableAlert = (callback) => { 
@@ -35,19 +39,23 @@
   onMount(() => {
     // montar acciones de la tabla
       // ejemplos
-    rolePermissionDataTable.addButton.action = () => rolePermissionDataTable.addRow();
+    rolesDataTable.addButton.action = () => rolesDataTable.addRow();
     //systemDataTable.addButton.action = () => systemDataTable.goToLink('/users');
     //systemDataTable.addButton.action = () => systemDataTable.goToHref(BASE_URL + 'hola');
     //systemDataTable.addButton.action = () => systemDataTable.openTab(BASE_URL + 'hola');
     // table action buttons
-    rolePermissionDataTable.actionButtons = [
+    rolesDataTable.actionButtons = [
       {
         class: 'btn-secondary',
         icon: 'fa-list',
         label: 'Permisos',
         action: (record) => {
           //systemDataTable.askToDeleteRow(record, 'id');
-          //console.log(record);
+          roleId = record.id;
+          permissionsDataTable.fetchURL = BASE_URL + 'apis/v1/roles/' + roleId + '/permissions';
+          permissionsDataTable.saveURL = BASE_URL + 'apis/v1/permissions/' + roleId;
+          permissionsDataTable.list();
+          displayPermission = true;
         }
       },
       {
@@ -57,7 +65,20 @@
         action: (record) => {
           //systemDataTable.askToDeleteRow(record, 'id');
           //console.log(record);
-          rolePermissionDataTable.deleteRow(record, 'id');
+          rolesDataTable.deleteRow(record, 'id');
+        }
+      },
+    ];
+    permissionsDataTable.addButton.action = () => permissionsDataTable.addRow();
+    permissionsDataTable.actionButtons = [
+      {
+        class: 'btn-danger',
+        icon: 'fa-trash',
+        label: 'Eliminar',
+        action: (record) => {
+          //systemDataTable.askToDeleteRow(record, 'id');
+          //console.log(record);
+          permissionsDataTable.deleteRow(record, 'id');
         }
       },
     ];
@@ -78,7 +99,7 @@
       <h4 class="subtitle">Lista de Roles</h4>
     </div>
     <DataTable 
-      bind:this={rolePermissionDataTable}
+      bind:this={rolesDataTable}
       fetchURL={BASE_URL + 'apis/v1/systems/' + systemId + '/roles'}
       saveURL={BASE_URL + 'apis/v1/roles/' + systemId}
       columnKeys={['id', 'name', ]}
@@ -114,9 +135,45 @@
       on:alert={handleTableAlert}
     />
   </div>
-  <div class="col-md-6">
+  <div class="col-md-6 {!displayPermission ? 'd-none' : ''}" style="padding-left: 30px; padding-right: 20px;">
     <div class="row subtitle-row">
       <h4 class="subtitle">Lista de Permisos del Rol</h4>
+      <DataTable 
+        bind:this={permissionsDataTable}
+        fetchURL={BASE_URL + 'apis/v1/roles/' + permissionId + '/permissions'}
+        saveURL={BASE_URL + 'apis/v1/permission/' + roleId}
+        columnKeys={['id', 'name', ]}
+        columnTypes={['id', 'input[text]', ]}
+        columnNames={['ID', 'Nombre', 'Acciones']}
+        columnStyles={['max-width: 50px;', 'max-width: 150px;', 'max-width: 150px;']}
+        columnClasses={['d-none', '', 'text-end']}
+        messages = {{
+          success: 'Datos actualizados', 
+          errorNetwork: 'No se pudo listar los permisos del rol. No hay conexión con el servidor.',
+          notFound: 'No se pudo listar los permisos del rol. Recurso no encontrado.',
+          serverError:'No se pudo listar los permisos del rol. Error interno del servidor',
+          requestError: 'No se pudo listar los permisos del rol. No se recibió respuesta del servidor',
+          otherError: 'No se pudo listar los permisos del rol. Ocurrió un error no esperado al traer los datos del servidor',
+        }}
+        addButton={{
+          display: true,
+          disabled: false,
+          action: null
+        }}
+        saveButton={{
+          display: true,
+          disabled: false,
+          action: null
+        }}
+        pagination = {{
+          display: false,
+          step: 10,
+          totalPages: 0,
+          actualPage: 1
+        }}
+        actionButtons={[]} 
+        on:alert={handleTableAlert}
+      />
     </div>
   </div>
 </div>

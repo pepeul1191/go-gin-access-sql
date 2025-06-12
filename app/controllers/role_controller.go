@@ -12,6 +12,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// POST: apis/v1/roles/:system-id
 func SaveRoles(c *gin.Context) {
 	systemIdStr := c.Param("system-id")
 
@@ -112,4 +113,42 @@ func SaveRoles(c *gin.Context) {
 
 	// Responder con éxito
 	c.JSON(http.StatusOK, response)
+}
+
+// GET: apis/v1/roles/:id/permission
+func RoleFetchPermissions(c *gin.Context) {
+	var permissions []models.Permission
+	idStr := c.Param("id")
+	// Convertir el ID a uint (puedes usar strconv.ParseUint si prefieres)
+	var roleID uint
+	if _, err := fmt.Sscanf(idStr, "%d", &roleID); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "ID de rol inválido",
+		})
+		return
+	}
+	// Conexión a la base de datos
+	if err := configs.ConnectToDB(); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error":   "No se pudo conectar a la base de datos",
+			"message": err.Error(),
+		})
+		return
+	}
+	// query a la base de datos
+	if err := configs.DB.Where("role_id = ?", roleID).Find(&permissions).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error":   "Error al obtener los permisos",
+			"message": err.Error(),
+		})
+		return
+	}
+	// Respuesta
+	// Si no se encontraron permissions, devolver arreglo vacío
+	if len(permissions) == 0 {
+		c.JSON(http.StatusOK, []struct{}{})
+		return
+	}
+	// Devolver respuesta exitosa
+	c.JSON(http.StatusOK, permissions)
 }
