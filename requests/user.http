@@ -37,3 +37,12 @@ Cookie: {{session}}
 {
   "reset_key": "bmccormickd"
 }
+
+### Actualizar activated
+PUT {{baseUrl}}/apis/v1/users/54/activated
+Content-Type: application/json
+Cookie: {{session}}
+
+{
+  "activated": false
+}

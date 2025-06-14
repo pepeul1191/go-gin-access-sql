@@ -32,3 +32,7 @@ type UpdateActivationKeyUserInput struct {
 type UpdateResetKeyUserInput struct {
 	ResetKey string `json:"reset_key" binding:"required"`
 }
+
+type UpdateActivatedUserInput struct {
+	Activated bool `json:"activated"`
+}
