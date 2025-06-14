@@ -1,0 +1,12 @@
+@baseUrl = http://localhost:8080
+@session = mysession=MTc0OTg1Nzc5MHxEWDhFQVFMX2dBQUJFQUVRQUFBb180QUFBUVp6ZEhKcGJtY01DQUFHYzNSaGRIVnpCbk4wY21sdVp3d0tBQWhoWTNScGRtRjBaUT09fMsOMrySaZXb7iVqWPzRGdBZzMNWzsX53YvrKgdxuykg
+
+### Crear usuario
+POST {{baseUrl}}/apis/v1/users
+Content-Type: application/json
+Cookie: {{session}}
+
+{
+  "username": "bmccormickd",
+  "email": "amandabaker@example.orgd"
+}

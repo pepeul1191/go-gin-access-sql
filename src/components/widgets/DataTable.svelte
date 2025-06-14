@@ -5,6 +5,7 @@
   import { Modal } from 'bootstrap';
   import { navigate } from 'svelte-routing';
   import random from '../../helpers/random.js';
+  import toDatetimeLocalWithSeconds from '../../helpers/datetime.js';
 
   export let recordId = 'id';
   export let observer = { new: [], edit: [], delete: []};
@@ -470,6 +471,8 @@
         <td class="data-td {columnClasses[i]}" style="{columnStyles[i]}">
           {#if columnTypes[i] == 'input[text]'}
             <input type="text" key="{key}" on:keydown={inputTextKeyDown} bind:value={record[key]} />
+          {:else if columnTypes[i] == 'td-datetime'}
+            {record[key]}
           {:else} <!-- if columnTypes[i] == 'td'} -->
             {record[key]}
           {/if}

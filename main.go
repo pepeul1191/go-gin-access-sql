@@ -29,6 +29,14 @@ func setupRoutes(r *gin.Engine) {
 	r.GET("/apis/v1/roles/:id/permissions", configs.APIAuthRequired(), controllers.RoleFetchPermissions)
 	// permissions controller
 	r.POST("/apis/v1/permissions/:role-id", configs.APIAuthRequired(), controllers.SavePermissions)
+	// user controller
+	r.GET("/apis/v1/users", configs.APIAuthRequired(), controllers.UserFetchAll)
+	//r.GET("/apis/v1/users/:id", configs.APIAuthRequired(), controllers.UserFetchOne)
+	r.POST("/apis/v1/users", configs.APIAuthRequired(), controllers.UserCreate)
+	//r.PUT("/apis/v1/users/:id/email", configs.APIAuthRequired(), controllers.UserUpdateEmail)
+	//r.PUT("/apis/v1/users/:id/activated", configs.APIAuthRequired(), controllers.UserUpdateActivated)
+	//r.PUT("/apis/v1/users/:id/password-reset", configs.APIAuthRequired(), controllers.UserUpdatePassword)
+	//r.DELETE("/apis/v1/users/:id", configs.APIAuthRequired(), controllers.UserDelete)
 	// error controller
 	r.NoRoute(controllers.Error404)
 }
