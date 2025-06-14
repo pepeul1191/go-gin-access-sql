@@ -10,3 +10,13 @@ Cookie: {{session}}
   "username": "bmccormickd",
   "email": "amandabaker@example.orgd"
 }
+
+### Actualizar correo de usuario
+PUT {{baseUrl}}/apis/v1/users/52/email
+Content-Type: application/json
+Cookie: {{session}}
+
+{
+  "username": "bmccormickd",
+  "email": "amandabaker@example.orgd"
+}

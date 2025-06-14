@@ -20,3 +20,7 @@ type CreateUserInput struct {
 	Username string `json:"username" binding:"required"`
 	Email    string `json:"email" binding:"required,email"`
 }
+
+type UpdatePasswordUserInput struct {
+	Pasword string `json:"password" binding:"required"`
+}
