@@ -24,3 +24,7 @@ type CreateUserInput struct {
 type UpdatePasswordUserInput struct {
 	Pasword string `json:"password" binding:"required"`
 }
+
+type UpdateActivationKeyUserInput struct {
+	ActivationKey string `json:"activation_key" binding:"required"`
+}

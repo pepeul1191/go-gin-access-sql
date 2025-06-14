@@ -33,9 +33,10 @@ func setupRoutes(r *gin.Engine) {
 	r.GET("/apis/v1/users", configs.APIAuthRequired(), controllers.UserFetchAll)
 	//r.GET("/apis/v1/users/:id", configs.APIAuthRequired(), controllers.UserFetchOne)
 	r.POST("/apis/v1/users", configs.APIAuthRequired(), controllers.UserCreate)
-	r.PUT("/apis/v1/users/:id/email", configs.APIAuthRequired(), controllers.UserUpdateEmail)
+	//r.PUT("/apis/v1/users/:id/email", configs.APIAuthRequired(), controllers.UserUpdateEmail)
+	r.PUT("/apis/v1/users/:id/password", configs.APIAuthRequired(), controllers.UserUpdatePassword)
+	r.PUT("/apis/v1/users/:id/activation-key", configs.APIAuthRequired(), controllers.UserUpdateActivationKey)
 	//r.PUT("/apis/v1/users/:id/activated", configs.APIAuthRequired(), controllers.UserUpdateActivated)
-	//r.PUT("/apis/v1/users/:id/password-reset", configs.APIAuthRequired(), controllers.UserUpdatePassword)
 	//r.DELETE("/apis/v1/users/:id", configs.APIAuthRequired(), controllers.UserDelete)
 	// error controller
 	r.NoRoute(controllers.Error404)

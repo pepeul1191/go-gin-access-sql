@@ -12,11 +12,19 @@ Cookie: {{session}}
 }
 
 ### Actualizar correo de usuario
-PUT {{baseUrl}}/apis/v1/users/52/email
+PUT {{baseUrl}}/apis/v1/users/54/email
 Content-Type: application/json
 Cookie: {{session}}
 
 {
-  "username": "bmccormickd",
-  "email": "amandabaker@example.orgd"
+  "password": "bmccormickd"
+}
+
+### Actualizar activtion key
+PUT {{baseUrl}}/apis/v1/users/54/activation-key
+Content-Type: application/json
+Cookie: {{session}}
+
+{
+  "activation_key": "bmccormickd"
 }

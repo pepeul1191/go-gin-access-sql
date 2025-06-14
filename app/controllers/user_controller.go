@@ -137,7 +137,7 @@ func UserCreate(c *gin.Context) {
 	}
 }
 
-// POST: /apis/v1/users
+// POST: /apis/v1/users/:id/password
 func UserUpdatePassword(c *gin.Context) {
 	id := c.Param("id")
 	var user models.User
@@ -167,5 +167,40 @@ func UserUpdatePassword(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "No se pudo actualizar", "message": err.Error()})
 		return
 	}
+	// TODO: enviar correo
 	c.JSON(http.StatusOK, "Contraseña actualizada")
+}
+
+// POST: /apis/v1/users/:id/activation-key
+func UserUpdateActivationKey(c *gin.Context) {
+	id := c.Param("id")
+	var user models.User
+	var input models.UpdateActivationKeyUserInput
+	// Parsear JSON recibido
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "JSON inválido", "message": err.Error()})
+		return
+	}
+	// Conexión a la base de datos
+	if err := configs.ConnectToDB(); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error":   "No se pudo conectar a la base de datos",
+			"message": err.Error(),
+		})
+		return
+	}
+	// Buscar el sistema existente
+	if err := configs.DB.First(&user, id).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Usuario para configurar cambio de clave de cambio de contraseña no encontrado"})
+		return
+	}
+	// actualizar
+	user.Updated = time.Now()
+	user.ActivationKey = input.ActivationKey
+	if err := configs.DB.Model(&user).Select("activation_key", "updated").Updates(user).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "No se pudo actualizar", "message": err.Error()})
+		return
+	}
+	// TODO: enviar correo
+	c.JSON(http.StatusOK, "Clave de activación actualizada")
 }
