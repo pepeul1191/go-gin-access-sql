@@ -28,3 +28,7 @@ type UpdatePasswordUserInput struct {
 type UpdateActivationKeyUserInput struct {
 	ActivationKey string `json:"activation_key" binding:"required"`
 }
+
+type UpdateResetKeyUserInput struct {
+	ResetKey string `json:"reset_key" binding:"required"`
+}

@@ -204,3 +204,37 @@ func UserUpdateActivationKey(c *gin.Context) {
 	// TODO: enviar correo
 	c.JSON(http.StatusOK, "Clave de activación actualizada")
 }
+
+// POST: /apis/v1/users/:id/reset-key
+func UserUpdateResetKey(c *gin.Context) {
+	id := c.Param("id")
+	var user models.User
+	var input models.UpdateResetKeyUserInput
+	// Parsear JSON recibido
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "JSON inválido", "message": err.Error()})
+		return
+	}
+	// Conexión a la base de datos
+	if err := configs.ConnectToDB(); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error":   "No se pudo conectar a la base de datos",
+			"message": err.Error(),
+		})
+		return
+	}
+	// Buscar el sistema existente
+	if err := configs.DB.First(&user, id).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Usuario para configurar cambio de clave de cambio de contraseña no encontrado"})
+		return
+	}
+	// actualizar
+	user.Updated = time.Now()
+	user.ResetKey = input.ResetKey
+	if err := configs.DB.Model(&user).Select("reset_key", "updated").Updates(user).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "No se pudo actualizar", "message": err.Error()})
+		return
+	}
+	// TODO: enviar correo
+	c.JSON(http.StatusOK, "Clave de reseto actualizada")
+}

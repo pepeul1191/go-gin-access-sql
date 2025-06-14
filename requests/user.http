@@ -20,11 +20,20 @@ Cookie: {{session}}
   "password": "bmccormickd"
 }
 
-### Actualizar activtion key
+### Actualizar activation key
 PUT {{baseUrl}}/apis/v1/users/54/activation-key
 Content-Type: application/json
 Cookie: {{session}}
 
 {
   "activation_key": "bmccormickd"
+}
+
+### Actualizar reset key
+PUT {{baseUrl}}/apis/v1/users/54/reset-key
+Content-Type: application/json
+Cookie: {{session}}
+
+{
+  "reset_key": "bmccormickd"
 }
