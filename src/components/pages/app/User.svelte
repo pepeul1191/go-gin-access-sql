@@ -33,7 +33,9 @@
 
   const handleFormSave = (event) => {
     userDataTable.list();
-    userDetailModalInstance.hide();
+    console.log(event)
+    //userDetailModalInstance.hide();
+    modalTitle = 'Editar Usuario';
   };
 
   const editSystem = (system) => {

@@ -129,7 +129,7 @@ func UserCreate(c *gin.Context) {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "No se pudo crear el sistema", "message": err.Error()})
 			return
 		}
-		c.JSON(http.StatusCreated, user.ID)
+		c.JSON(http.StatusCreated, gin.H{"id": user.ID})
 	} else {
 		// avisar que usuario y contraseña en uso
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Usuario y contraseña y en uso", "message": ""})
@@ -137,7 +137,7 @@ func UserCreate(c *gin.Context) {
 	}
 }
 
-// POST: /apis/v1/users/:id/password
+// PUT: /apis/v1/users/:id/password
 func UserUpdatePassword(c *gin.Context) {
 	id := c.Param("id")
 	var user models.User
@@ -171,7 +171,7 @@ func UserUpdatePassword(c *gin.Context) {
 	c.JSON(http.StatusOK, "Contraseña actualizada")
 }
 
-// POST: /apis/v1/users/:id/activation-key
+// PUT: /apis/v1/users/:id/activation-key
 func UserUpdateActivationKey(c *gin.Context) {
 	id := c.Param("id")
 	var user models.User
@@ -205,7 +205,7 @@ func UserUpdateActivationKey(c *gin.Context) {
 	c.JSON(http.StatusOK, "Clave de activación actualizada")
 }
 
-// POST: /apis/v1/users/:id/reset-key
+// PUT: /apis/v1/users/:id/reset-key
 func UserUpdateResetKey(c *gin.Context) {
 	id := c.Param("id")
 	var user models.User
@@ -239,7 +239,7 @@ func UserUpdateResetKey(c *gin.Context) {
 	c.JSON(http.StatusOK, "Clave de reseto actualizada")
 }
 
-// POST: /apis/v1/users/:id/activated
+// PUT: /apis/v1/users/:id/activated
 func UserUpdateActivated(c *gin.Context) {
 	id := c.Param("id")
 	var user models.User
