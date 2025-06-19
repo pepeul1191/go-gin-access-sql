@@ -16,6 +16,15 @@ type User struct {
 	Updated       time.Time `gorm:"not null" json:"updated"`
 }
 
+type UserSummary struct {
+	ID        uint      `json:"id"`
+	Username  string    `json:"username"`
+	Email     string    `json:"email"`
+	Activated bool      `json:"activated"`
+	Created   time.Time `gorm:"not null" json:"created"`
+	Updated   time.Time `gorm:"not null" json:"updated"`
+}
+
 type CreateUserInput struct {
 	Username string `json:"username" binding:"required"`
 	Email    string `json:"email" binding:"required,email"`

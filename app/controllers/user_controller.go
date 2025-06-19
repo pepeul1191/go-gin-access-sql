@@ -13,7 +13,7 @@ import (
 
 // GET: apis/v1/users
 func UserFetchAll(c *gin.Context) {
-	var users []models.User
+	var users []models.UserSummary
 	var total int64
 	// Obtener parámetros opcionales
 	name := c.Query("name")
@@ -137,6 +137,27 @@ func UserCreate(c *gin.Context) {
 	}
 }
 
+// GET: /apis/v1/users/:id
+func UserFetchOne(c *gin.Context) {
+	id := c.Param("id")
+	var user models.User
+	// Conexión a la base de datos
+	if err := configs.ConnectToDB(); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error":   "No se pudo conectar a la base de datos",
+			"message": err.Error(),
+		})
+		return
+	}
+	// Buscar el sistema existente
+	if err := configs.DB.First(&user, id).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Usuario para configurar contraseña no encontrado"})
+		return
+	}
+	// response
+	c.JSON(http.StatusOK, gin.H{"id": user.ID, "username": user.Username, "email": user.Email})
+}
+
 // PUT: /apis/v1/users/:id/password
 func UserUpdatePassword(c *gin.Context) {
 	id := c.Param("id")
@@ -175,12 +196,6 @@ func UserUpdatePassword(c *gin.Context) {
 func UserUpdateActivationKey(c *gin.Context) {
 	id := c.Param("id")
 	var user models.User
-	var input models.UpdateActivationKeyUserInput
-	// Parsear JSON recibido
-	if err := c.ShouldBindJSON(&input); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "JSON inválido", "message": err.Error()})
-		return
-	}
 	// Conexión a la base de datos
 	if err := configs.ConnectToDB(); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -196,7 +211,7 @@ func UserUpdateActivationKey(c *gin.Context) {
 	}
 	// actualizar
 	user.Updated = time.Now()
-	user.ActivationKey = input.ActivationKey
+	user.ActivationKey = configs.HelperRandomString(30)
 	if err := configs.DB.Model(&user).Select("activation_key", "updated").Updates(user).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "No se pudo actualizar", "message": err.Error()})
 		return
@@ -209,12 +224,7 @@ func UserUpdateActivationKey(c *gin.Context) {
 func UserUpdateResetKey(c *gin.Context) {
 	id := c.Param("id")
 	var user models.User
-	var input models.UpdateResetKeyUserInput
 	// Parsear JSON recibido
-	if err := c.ShouldBindJSON(&input); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "JSON inválido", "message": err.Error()})
-		return
-	}
 	// Conexión a la base de datos
 	if err := configs.ConnectToDB(); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -230,7 +240,7 @@ func UserUpdateResetKey(c *gin.Context) {
 	}
 	// actualizar
 	user.Updated = time.Now()
-	user.ResetKey = input.ResetKey
+	user.ResetKey = configs.HelperRandomString(30)
 	if err := configs.DB.Model(&user).Select("reset_key", "updated").Updates(user).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "No se pudo actualizar", "message": err.Error()})
 		return
@@ -269,5 +279,5 @@ func UserUpdateActivated(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "No se pudo actualizar", "message": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, "Cambio del esetado de activación actualizada")
+	c.JSON(http.StatusOK, input.Activated)
 }

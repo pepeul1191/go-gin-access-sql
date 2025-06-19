@@ -20,7 +20,7 @@
   let rolePermissionModal;
   let rolePermissionFormInstance;
 
-  const addSystem = () => {
+  const addUser = () => {
     modalTitle = 'Agregar Usuario'
     userFormInstance.clean();
     userDetailModalInstance.show();
@@ -33,24 +33,15 @@
 
   const handleFormSave = (event) => {
     userDataTable.list();
-    console.log(event)
     //userDetailModalInstance.hide();
     modalTitle = 'Editar Usuario';
   };
 
-  const editSystem = (system) => {
+  const editUser = (user) => {
     modalTitle = 'Editar Usuario'
     userFormInstance.clean();
-    userFormInstance.loadSystem(system);
+    userFormInstance.loadUser(user);
     userDetailModalInstance.show();
-  }
-
-  const rolesAndPermission = (system) => {
-    modalTitle = 'Gestión de Roles y Permisos del Usuario ' + system.name
-    //userFormInstance.clean();
-    //userFormInstance.loadSystem(system);
-    rolePermissionModalInstance.show();
-    rolePermissionFormInstance.setSystemId(system);
   }
 
   const handleSearchFilter = (event) => {
@@ -96,7 +87,7 @@
         class: 'btn-secondary',
         icon: 'fa-pencil',
         label: 'Editar',
-        action: editSystem
+        action: editUser
       },
       {
         class: 'btn-danger',
@@ -188,7 +179,7 @@
       addButton={{
         display: true,
         disabled: false,
-        action: addSystem
+        action: addUser
       }}
       pagination = {{
         display: true,

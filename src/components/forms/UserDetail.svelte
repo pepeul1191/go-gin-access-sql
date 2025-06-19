@@ -4,7 +4,18 @@
   import { createEventDispatcher } from 'svelte';
 
   export const clean = () => {
-
+    btnsDisabled = true;
+    user = {
+      id: null,
+      username: '',
+      password: '',
+      activation_key: '',
+      reset_key: '',
+      email: '',
+      activated: false,
+      created: '',
+      updated: ''
+    };
   }
 
   export let user = {
@@ -52,6 +63,15 @@
   function submitForm() {
     // Aquí haces el fetch/axios PUT a tu API
     console.log('Enviar usuario actualizado:', user);
+  }
+
+  export const loadUser = (record) => {
+    user.id = record.id;
+    user.username = record.username;
+    user.email = record.email;
+    user.activated = record.activated;
+    btnsDisabled = false;
+    //console.log(record)
   }
 
   const cleanMessage = (dispatchToParent) => {
@@ -160,6 +180,108 @@
         console.error("Error al copiar: ", err);
       });    
   }
+
+  const activationEmail = async (event) => {
+    try {
+      // Enviar datos usando Axios
+      let response;
+      console.log(event.target)
+      if(user.id != null){
+        const formData = {
+        };
+        response = await axios.put(BASE_URL + 'apis/v1/users/' + user.id + '/activation-key', formData, {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        message.text = 'Se ha enviado un correo de activación de cuenta';
+        message.status = 'success';
+        // notificar al padre que se ha actualizado algo
+        cleanMessage(false);
+      }else{
+        message.text = 'No puede enviar el correo de activación de cuenta';
+        message.status = 'danger';
+        // notificar al padre que se ha actualizado algo
+        cleanMessage(false);
+      }
+      // Puedes manejar la respuesta aquí, por ejemplo, mostrar un mensaje de éxito
+    } catch (error) {
+      console.error('Error al enviar los datos:', error);
+      message.text = 'Error al enviar el correo de activación de cuenta';
+      message.status = 'danger';
+      cleanMessage(false);
+      // Maneja el error (puedes mostrar un mensaje de error en la interfaz de usuario)
+    }
+  };
+
+  const passwordEmail = async (event) => {
+    try {
+      // Enviar datos usando Axios
+      let response;
+      console.log(event.target)
+      if(user.id != null){
+        const formData = {
+        };
+        response = await axios.put(BASE_URL + 'apis/v1/users/' + user.id + '/reset-key', formData, {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        message.text = 'Se ha enviado un correo para actualizar su contraseña';
+        message.status = 'success';
+        // notificar al padre que se ha actualizado algo
+        cleanMessage(false);
+      }else{
+        message.text = 'No puede enviar el correo para actualizar su contraseña';
+        message.status = 'danger';
+        // notificar al padre que se ha actualizado algo
+        cleanMessage(false);
+      }
+      // Puedes manejar la respuesta aquí, por ejemplo, mostrar un mensaje de éxito
+    } catch (error) {
+      console.error('Error al enviar los datos:', error);
+      message.text = 'Error al enviar el correo para actualizar su contraseña';
+      message.status = 'danger';
+      cleanMessage(false);
+      // Maneja el error (puedes mostrar un mensaje de error en la interfaz de usuario)
+    }
+  };
+
+  const activationAccount = async (event, newStatus) => {
+    try {
+      // Enviar datos usando Axios
+      let response;
+      console.log(event.target)
+      console.log(newStatus)
+      if(user.id != null){
+        const formData = {
+          activated: newStatus
+        };
+        response = await axios.put(BASE_URL + 'apis/v1/users/' + user.id + '/activated', formData, {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        message.text = 'Se ha cambiado el estado de cuenta del usuario';
+        message.status = 'success';
+        user.activated = response.data;
+        // notificar al padre que se ha actualizado algo
+        cleanMessage(false);
+      }else{
+        message.text = 'No puede cambiar el estado de cuenta del usuario';
+        message.status = 'danger';
+        // notificar al padre que se ha actualizado algo
+        cleanMessage(false);
+      }
+      // Puedes manejar la respuesta aquí, por ejemplo, mostrar un mensaje de éxito
+    } catch (error) {
+      console.error('Error al cambiar los datos:', error);
+      message.text = 'Error al cambiar el estado de cuenta del usuario';
+      message.status = 'danger';
+      cleanMessage(false);
+      // Maneja el error (puedes mostrar un mensaje de error en la interfaz de usuario)
+    }
+  };
 </script>
 
 <style>
@@ -214,9 +336,15 @@
   <div class="col-md-4">
     <h4 class="subtitle mb-3">Estado de Cuenta</h4>
     <div class="d-flex justify-content-start">
-      <button disabled={btnsDisabled} class="btn btn-primary">
-        <i class="fa fa-check"></i> Activar Cuenta
-      </button>
+      {#if user.activated}
+        <button disabled={btnsDisabled} class="btn btn-danger" on:click={(event) => activationAccount(event, false)}>
+          <i class="fa fa-times"></i> Desactivar Cuenta
+        </button>
+      {:else}
+        <button disabled={btnsDisabled} class="btn btn-primary" on:click={(event) => activationAccount(event, true)}>
+          <i class="fa fa-check"></i> Activar Cuenta
+        </button>
+      {/if}
     </div>
   </div>
 
@@ -224,10 +352,10 @@
   <div class="col-md-8">
     <h4 class="subtitle mb-3">Enviar Solicitudes a Correo</h4>
     <div class="d-flex flex-wrap gap-2">
-      <button disabled={btnsDisabled} class="btn btn-info">
+      <button disabled={btnsDisabled} class="btn btn-info" on:click={activationEmail}>
         <i class="fa fa-envelope"></i> Activación de Cuenta
       </button>
-      <button disabled={btnsDisabled} class="btn btn-warning">
+      <button disabled={btnsDisabled} class="btn btn-warning" on:click={passwordEmail}>
         <i class="fa fa-refresh"></i> Cambio de Contraseña
       </button>
     </div>

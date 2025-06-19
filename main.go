@@ -13,6 +13,7 @@ func setupRoutes(r *gin.Engine) {
 	// home controller
 	r.GET("/", configs.ViewAuthRequired(), controllers.HomeIndex)
 	r.GET("/systems", configs.ViewAuthRequired(), controllers.HomeIndex)
+	r.GET("/systems/:system_id/users", configs.ViewAuthRequired(), controllers.HomeIndex)
 	r.GET("/users", configs.ViewAuthRequired(), controllers.HomeIndex)
 	// login controller
 	r.GET("/login", configs.ViewAuthGoToHome(), controllers.LoginIndex)
@@ -31,6 +32,7 @@ func setupRoutes(r *gin.Engine) {
 	r.POST("/apis/v1/permissions/:role-id", configs.APIAuthRequired(), controllers.SavePermissions)
 	// user controller
 	r.GET("/apis/v1/users", configs.APIAuthRequired(), controllers.UserFetchAll)
+	r.GET("/apis/v1/users/:id", configs.APIAuthRequired(), controllers.UserFetchOne)
 	//r.GET("/apis/v1/users/:id", configs.APIAuthRequired(), controllers.UserFetchOne)
 	r.POST("/apis/v1/users", configs.APIAuthRequired(), controllers.UserCreate)
 	//r.PUT("/apis/v1/users/:id/email", configs.APIAuthRequired(), controllers.UserUpdateEmail)
