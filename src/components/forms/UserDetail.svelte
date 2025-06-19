@@ -2,6 +2,7 @@
   import { onMount } from 'svelte';
   import axios from 'axios';
   import { createEventDispatcher } from 'svelte';
+  import { toDatetimeLocalWithSeconds } from '../../helpers/datetime.js';
 
   export const clean = () => {
     btnsDisabled = true;
@@ -50,14 +51,16 @@
 
   function regeneratePassword() {
     user.password = generateKey(16); // Cambiar si usas un backend que genera el hash
-  }
-
-  function regenerateActivationKey() {
-    user.activation_key = generateKey(10);
-  }
-
-  function regenerateResetKey() {
-    user.reset_key = generateKey(10);
+    navigator.clipboard.writeText(user.password)
+      .then(() => {
+        messagePassword = 'Contraseña generada copiada al portapapeles';
+        setTimeout(() => {
+          messagePassword = '';
+        }, 4300);
+      })
+      .catch(err => {
+        console.error("Error al copiar: ", err);
+      });   
   }
 
   function submitForm() {
@@ -94,11 +97,11 @@
       // Enviar datos usando Axios
       let response;
       btnDisabled = true;
+      const formData = {
+        username: user.username,
+        email: user.email
+      };
       if(user.id == null){
-        const formData = {
-          username: user.username,
-          email: user.email
-        };
         response = await axios.post(BASE_URL + 'apis/v1/users', formData, {
           headers: {
             'Content-Type': 'application/json',
@@ -111,15 +114,23 @@
         btnsDisabled = false;
         cleanMessage(true);
       }else{
-        response = await axios.put(BASE_URL + 'apis/v1/systems', formData, {
+        response = await axios.put(BASE_URL + 'apis/v1/users/' + user.id, formData, {
           headers: {
             'Content-Type': 'application/json',
           },
-        });  
-        updated = toDatetimeLocalWithSeconds(response.data.updated);
-        message.text = 'Se ha editado el usuario';
-        message.status = 'success';
-        cleanMessage(true);
+        }); 
+        console.log(response);
+        if(response.status == 200){
+          user.updated = toDatetimeLocalWithSeconds(response.data.updated);
+          message.text = 'Se ha editado el usuario';
+          message.status = 'success';
+          cleanMessage(true);
+        }else{
+          console.log(response.data)
+          message.text = response.data.error;
+          message.status = 'danger';
+          cleanMessage(false);
+        }
       }
       console.log('Datos enviados con éxito:', response.data);
       // Puedes manejar la respuesta aquí, por ejemplo, mostrar un mensaje de éxito
@@ -166,19 +177,6 @@
       cleanMessage(false);
       // Maneja el error (puedes mostrar un mensaje de error en la interfaz de usuario)
     }
-  }
-
-  const copyPassword = (event) =>{
-    navigator.clipboard.writeText(user.password)
-      .then(() => {
-        messagePassword = 'Contraseña copiada al portapapeles';
-        setTimeout(() => {
-          messagePassword = '';
-        }, 4300);
-      })
-      .catch(err => {
-        console.error("Error al copiar: ", err);
-      });    
   }
 
   const activationEmail = async (event) => {
@@ -323,10 +321,14 @@
   <div class="mb-3">
     <label class="form-label">Contraseña &nbsp;&nbsp;&nbsp;&nbsp;<span class="text-success">{messagePassword}</span></label>
     <div class="input-group">
-      <input type="password" disabled class="form-control" bind:value={user.password}>
-      <button type="button" disabled={btnsDisabled} class="btn btn-secondary" on:click={regeneratePassword}><i class="fa fa-random"></i> Regenerar</button>
-      <button type="button" disabled={btnsDisabled} class="btn btn-info" on:click={copyPassword}><i class="fa fa-copy"></i> Copiar</button>
-      <button type="button" disabled={btnsDisabled} class="btn btn-success" on:click={savePassword}><i class="fa fa-save"></i> Guardar</button>
+      <input type="password" disabled class="form-control" bind:value={user.password} style="margin-right: 20px;" >
+      <!-- Espaciado entre botones usando clases de Bootstrap -->
+      <button type="button" disabled={btnsDisabled} class="btn btn-secondary mr-2" on:click={regeneratePassword} style="margin-right: 20px;" >
+        <i class="fa fa-random"></i> Generar Contraseña Segura
+      </button>
+      <button type="button" disabled={btnsDisabled} class="btn btn-success" on:click={savePassword}>
+        <i class="fa fa-save"></i> Actualizar Contraseña
+      </button>
     </div>
   </div>
 </div>
@@ -352,7 +354,7 @@
   <div class="col-md-8">
     <h4 class="subtitle mb-3">Enviar Solicitudes a Correo</h4>
     <div class="d-flex flex-wrap gap-2">
-      <button disabled={btnsDisabled} class="btn btn-info" on:click={activationEmail}>
+      <button disabled={btnsDisabled} class="btn btn-info" on:click={activationEmail} style="margin-right: 10px;" >
         <i class="fa fa-envelope"></i> Activación de Cuenta
       </button>
       <button disabled={btnsDisabled} class="btn btn-warning" on:click={passwordEmail}>

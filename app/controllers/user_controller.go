@@ -269,7 +269,7 @@ func UserUpdateActivated(c *gin.Context) {
 	}
 	// Buscar el sistema existente
 	if err := configs.DB.First(&user, id).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Usuario para configurar cambio estado de activdad de usuario"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "Usuario no encontrado para configurar cambio estado de activdad de usuario"})
 		return
 	}
 	// actualizar
@@ -280,4 +280,53 @@ func UserUpdateActivated(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, input.Activated)
+}
+
+// PUT: /apis/v1/users/:id/activated
+func UserUpdate(c *gin.Context) {
+	id := c.Param("id")
+	var user models.User
+	var input models.UpdateUserInput
+	// Parsear JSON recibido
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "JSON inválido", "message": err.Error()})
+		return
+	}
+	// Conexión a la base de datos
+	if err := configs.ConnectToDB(); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error":   "No se pudo conectar a la base de datos",
+			"message": err.Error(),
+		})
+		return
+	}
+	// Buscar el sistema existente
+	if err := configs.DB.First(&user, id).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Usuario no encontrado"})
+		return
+	}
+	// Verificar si el nuevo username o email están en uso por otro usuario
+	if input.Username != user.Username {
+		var existingUser models.User
+		if err := configs.DB.Where("username = ? AND id != ?", input.Username, id).First(&existingUser).Error; err == nil {
+			c.JSON(http.StatusConflict, gin.H{"error": "El nombre de usuario ya está en uso"})
+			return
+		}
+	}
+	if input.Email != user.Email {
+		var existingUser models.User
+		if err := configs.DB.Where("email = ? AND id != ?", input.Email, id).First(&existingUser).Error; err == nil {
+			c.JSON(http.StatusConflict, gin.H{"error": "El correo electrónico ya está en uso"})
+			return
+		}
+	}
+	// actualizar
+	user.Updated = time.Now()
+	user.Username = input.Username
+	user.Email = input.Email
+	if err := configs.DB.Model(&user).Select("username", "email", "updated").Updates(user).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "No se pudo actualizar", "message": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"updated": user.Updated})
 }
