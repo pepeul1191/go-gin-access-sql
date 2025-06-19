@@ -1,5 +1,6 @@
 <script>
   import { onMount } from 'svelte';
+  import { navigate } from "svelte-routing";
   import { Modal } from 'bootstrap';
   import DataTable from '../../widgets/DataTable.svelte';
   import SystemDetail from '../../forms/SystemDetail.svelte';
@@ -51,6 +52,10 @@
     rolePermissionFormInstance.setSystemId(system);
   }
 
+  const showUsers = (system) => {
+    navigate(`/systems/${system.id}/users`);
+  }
+
   const handleSearchFilter = (event) => {
     const { name, description } = event.detail;
     systemDataTable.queryParams = {name,description};
@@ -100,9 +105,7 @@
         class: 'btn-secondary',
         icon: 'fa-users',
         label: 'Usuarios',
-        action: () => {
-          alert('ver');
-        }
+        action: showUsers
       },
       {
         class: 'btn-secondary',

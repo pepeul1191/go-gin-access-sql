@@ -39,7 +39,7 @@ func setupRoutes(r *gin.Engine) {
 	r.PUT("/apis/v1/users/:id/activation-key", configs.APIAuthRequired(), controllers.UserUpdateActivationKey)
 	r.PUT("/apis/v1/users/:id/reset-key", configs.APIAuthRequired(), controllers.UserUpdateResetKey)
 	r.PUT("/apis/v1/users/:id/activated", configs.APIAuthRequired(), controllers.UserUpdateActivated)
-	//r.DELETE("/apis/v1/users/:id", configs.APIAuthRequired(), controllers.UserDelete)
+	//r.DELETE("/apis/v1/users/:id", configs.APIAuthRequired(), controllers.UserDelete) TODO
 	// error controller
 	r.NoRoute(controllers.Error404)
 }

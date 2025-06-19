@@ -4,6 +4,7 @@
   import Home from '../pages/app/Home.svelte';
   import User from '../pages/app/User.svelte';
   import System from '../pages/app/System.svelte';
+  import SystemUsers from '../pages/app/SystemUsers.svelte';
 
   export let basepath = '/';
 </script>
@@ -37,6 +38,7 @@
   <Route path="/" component={Home} />
   <Route path="/systems" component={System} />
   <Route path="/users" component={User} />
+  <Route path="/systems/:id/users" let:params><SystemUsers id={params.id}/></Route>
 </Router>
 
 <!-- Pie de Página -->
