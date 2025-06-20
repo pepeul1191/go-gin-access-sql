@@ -202,3 +202,126 @@ func SystemFetchRoles(c *gin.Context) {
 	// Devolver respuesta exitosa
 	c.JSON(http.StatusOK, roles)
 }
+
+// GET: /apis/v1/systems/:id/users
+func SystemFetchUsers(c *gin.Context) {
+	var users []models.UserWithRegistrationStatus
+	var total int64
+
+	idStr := c.Param("id")
+	var systemID uint
+	if _, err := fmt.Sscanf(idStr, "%d", &systemID); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "ID de sistema inválido"})
+		return
+	}
+
+	username := c.Query("username")
+	email := c.Query("email")
+	step := c.Query("step")
+	page := c.Query("page")
+	activated := c.Query("status")
+
+	// Conexión a DB (asegúrate de que esto devuelva un *gorm.DB válido)
+	if err := configs.ConnectToDB(); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error":   "Conexión fallida",
+			"message": err.Error(),
+		})
+		return
+	}
+
+	// Construimos la parte base de la consulta
+	baseQuery := `
+			SELECT 
+					U.id,
+					U.username,
+					U.email,
+					CASE WHEN SU.system_id IS NOT NULL THEN TRUE ELSE FALSE END AS registered
+			FROM users U
+			LEFT JOIN systems_users SU ON U.id = SU.user_id AND SU.system_id = ?
+			WHERE 1=1
+	`
+
+	// Aplicamos filtros opcionales
+	args := []interface{}{systemID}
+	countArgs := []interface{}{systemID}
+
+	if username != "" {
+		baseQuery += " AND U.username LIKE ?"
+		args = append(args, "%"+username+"%")
+		countArgs = append(countArgs, "%"+username+"%")
+	}
+
+	if activated == "1" || activated == "0" {
+		var registeredFilter bool
+		if activated == "1" {
+			registeredFilter = true // usuario registrado
+		} else {
+			registeredFilter = false // usuario no registrado
+		}
+		baseQuery += " AND registered = ?"
+		args = append(args, registeredFilter)
+		countArgs = append(countArgs, registeredFilter)
+	}
+
+	if email != "" {
+		baseQuery += " AND U.email LIKE ?"
+		args = append(args, "%"+email+"%")
+		countArgs = append(countArgs, "%"+email+"%")
+	}
+
+	// Contar total
+	countQuery := "SELECT COUNT(*) FROM (" + baseQuery + ") AS tmp"
+
+	if err := configs.DB.Raw(countQuery, countArgs...).Scan(&total).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error":   "Error al contar usuarios",
+			"message": err.Error(),
+		})
+		return
+	}
+
+	// Paginación
+	if step != "" && page != "" {
+		stepInt, err1 := strconv.Atoi(step)
+		pageInt, err2 := strconv.Atoi(page)
+
+		if err1 == nil && err2 != nil || stepInt <= 0 || pageInt <= 0 {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Parámetros de paginación inválidos"})
+			return
+		}
+
+		offset := (pageInt - 1) * stepInt
+		args = append(args, stepInt, offset)
+		baseQuery += " LIMIT ? OFFSET ?"
+
+	} else if step != "" || page != "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Ambos parámetros 'step' y 'page' deben estar presentes"})
+		return
+	}
+
+	// Ejecutar la consulta final
+	if err := configs.DB.Raw(baseQuery, args...).Scan(&users).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error":   "Error al obtener usuarios del sistema",
+			"message": err.Error(),
+		})
+		return
+	}
+
+	// Respuesta
+	if step != "" && page != "" {
+		stepInt, _ := strconv.Atoi(step)
+		pages := int(math.Ceil(float64(total) / float64(stepInt)))
+		offset := (stepInt * (stepInt - 1))
+
+		c.JSON(http.StatusOK, gin.H{
+			"list":   users,
+			"pages":  pages,
+			"total":  total,
+			"offset": offset,
+		})
+	} else {
+		c.JSON(http.StatusOK, users)
+	}
+}

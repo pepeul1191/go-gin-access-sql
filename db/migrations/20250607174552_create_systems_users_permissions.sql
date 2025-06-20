@@ -1,6 +1,6 @@
 -- migrate:up
 
-CREATE TABLE system_user_permissions (
+CREATE TABLE systems_user_permissions (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   system_id INTEGER NOT NULL,
   user_id INTEGER NOT NULL,
@@ -13,4 +13,4 @@ CREATE TABLE system_user_permissions (
 
 -- migrate:down
 
-DROP TABLE system_user_permissions;
+DROP TABLE systems_user_permissions;

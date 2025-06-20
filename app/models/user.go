@@ -51,3 +51,10 @@ type UpdateUserInput struct {
 	Username string `json:"username" binding:"required"`
 	Email    string `json:"email" binding:"required,email"`
 }
+
+type UserWithRegistrationStatus struct {
+	ID         uint   `json:"id" gorm:"column:id"`
+	Username   string `json:"username" gorm:"column:username"`
+	Email      string `json:"email" gorm:"column:email"`
+	Registered bool   `json:"registered" gorm:"column:registered"`
+}

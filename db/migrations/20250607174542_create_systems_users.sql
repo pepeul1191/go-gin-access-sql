@@ -1,6 +1,6 @@
 -- migrate:up
 
-CREATE TABLE system_users (
+CREATE TABLE systems_users (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   system_id INTEGER NOT NULL,
   user_id INTEGER NOT NULL,
@@ -11,4 +11,4 @@ CREATE TABLE system_users (
 
 -- migrate:down
 
-DROP TABLE system_users;
+DROP TABLE systems_users;

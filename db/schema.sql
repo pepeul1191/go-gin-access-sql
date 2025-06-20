@@ -34,7 +34,7 @@ CREATE TABLE permissions (
   role_id INTEGER NOT NULL,
   FOREIGN KEY(role_id) REFERENCES roles(id)
 );
-CREATE TABLE system_users (
+CREATE TABLE systems_users (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   system_id INTEGER NOT NULL,
   user_id INTEGER NOT NULL,
@@ -42,7 +42,7 @@ CREATE TABLE system_users (
   FOREIGN KEY(system_id) REFERENCES systems(id),
   FOREIGN KEY(user_id) REFERENCES users(id)
 );
-CREATE TABLE system_user_permissions (
+CREATE TABLE systems_user_permissions (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   system_id INTEGER NOT NULL,
   user_id INTEGER NOT NULL,
