@@ -26,6 +26,7 @@ func setupRoutes(r *gin.Engine) {
 	r.DELETE("/apis/v1/systems/:id", configs.APIAuthRequired(), controllers.SystemDelete)
 	r.GET("/apis/v1/systems/:id/roles", configs.APIAuthRequired(), controllers.SystemFetchRoles)
 	r.GET("/apis/v1/systems/:id/users", configs.APIAuthRequired(), controllers.SystemFetchUsers)
+	r.POST("/apis/v1/systems/:id/users", configs.APIAuthRequired(), controllers.SystemSaveUsers)
 	// roles controller
 	r.POST("/apis/v1/roles/:system-id", configs.APIAuthRequired(), controllers.SaveRoles)
 	r.GET("/apis/v1/roles/:id/permissions", configs.APIAuthRequired(), controllers.RoleFetchPermissions)

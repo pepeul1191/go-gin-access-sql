@@ -192,6 +192,7 @@
       columnNames={['ID', 'Nombre', 'Descripción', 'Acciones']}
       columnStyles={['max-width: 50px;', 'max-width: 250px;', 'max-width: 400px;', 'max-width: 150px;']}
       columnClasses={['d-none', '', '', 'text-end']}
+      tdStyles={['max-width: 50px;', 'max-width: 250px;', 'max-width: 400px;', 'max-width: 150px;']}
       messages = {{
         success: 'Datos actualizados', 
         errorNetwork: 'No se pudo listar los sistemas. No hay conexión con el servidor.',

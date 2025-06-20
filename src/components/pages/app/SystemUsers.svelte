@@ -153,35 +153,37 @@
     <h4 class="subtitle">Listado de Usuario</h4>
   </div>
   <div class="container">
-    <DataTable 
-      bind:this={userDataTable}
-      fetchURL={BASE_URL + 'apis/v1/systems/' + id + '/users'}
-      columnKeys={['id', 'username', 'email', 'registered']}
-      columnTypes={['id', 'td', 'td', 'td']}
-      columnNames={['ID', 'Nombre', 'Correo', 'Registrado', 'Acciones']}
-      columnStyles={['max-width: 50px;', 'max-width: 250px;', 'max-width: 150px;']}
-      columnClasses={['d-none', '', '', '', 'text-end']}
-      messages = {{
-        success: 'Datos actualizados', 
-        errorNetwork: 'No se pudo listar los usuarios. No hay conexión con el servidor.',
-        notFound: 'No se pudo listar los usuarios. Recurso no encontrado.',
-        serverError:'No se pudo listar los usuarios. Error interno del servidor',
-        requestError: 'No se pudo listar los usuarios. No se recibió respuesta del servidor',
-        otherError: 'No se pudo listar los usuarios. Ocurrió un error no esperado al traer los datos del servidor',
-      }}
-      addButton={{
-        display: true,
-        disabled: false,
-        action: addUser
-      }}
-      pagination = {{
-        display: true,
-        step: 10,
-        totalPages: 0,
-        actualPage: 1
-      }}
-      actionButtons={[]} 
-      on:alert={handleTableAlert}
-    />
+    <div class="col-md-10">
+      <DataTable 
+        bind:this={userDataTable}
+        fetchURL={BASE_URL + 'apis/v1/systems/' + id + '/users'}
+        columnKeys={['id', 'username', 'email', 'registered']}
+        columnTypes={['id', 'td', 'td', 'radiobutton']}
+        columnNames={['ID', 'Nombre', 'Correo', 'Registrado', 'Acciones']}
+        columnStyles={['max-width: 50px;', 'max-width: 250px;', 'max-width: 150px;', '']}
+        tdStyles={['', '', '', 'padding-left: 40px;']}
+        columnClasses={['d-none', '', '', '', 'text-end']}
+        messages = {{
+          success: 'Datos actualizados', 
+          errorNetwork: 'No se pudo listar los usuarios. No hay conexión con el servidor.',
+          notFound: 'No se pudo listar los usuarios. Recurso no encontrado.',
+          serverError:'No se pudo listar los usuarios. Error interno del servidor',
+          requestError: 'No se pudo listar los usuarios. No se recibió respuesta del servidor',
+          otherError: 'No se pudo listar los usuarios. Ocurrió un error no esperado al traer los datos del servidor',
+        }}
+        saveButton={{
+          display: true,
+          disabled: false,
+        }}
+        pagination = {{
+          display: true,
+          step: 10,
+          totalPages: 0,
+          actualPage: 1
+        }}
+        actionButtons={[]} 
+        on:alert={handleTableAlert}
+      />
+    </div>
   </div>
 </div>

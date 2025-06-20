@@ -46,7 +46,7 @@
       <label for="email" class="form-label">Buscar por Correo</label>
       <input type="text" class="form-control" id="email" placeholder="Correo" bind:value={email} />
     </div>
-    <div class="col-md-3">
+    <div class="col-md-2">
       <label for="status" class="form-label">Estado</label>
       <select id="status" class="form-select" bind:value={statusFilter}>
         <option value="all">Todos</option>

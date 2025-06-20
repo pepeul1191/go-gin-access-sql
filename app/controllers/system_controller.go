@@ -4,6 +4,7 @@ package controllers
 import (
 	"access/app/configs"
 	"access/app/models"
+	"errors"
 	"fmt"
 	"math"
 	"net/http"
@@ -11,6 +12,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 // GET: apis/v1/systems
@@ -324,4 +326,114 @@ func SystemFetchUsers(c *gin.Context) {
 	} else {
 		c.JSON(http.StatusOK, users)
 	}
+}
+
+// POST: /apis/v1/systems/:id/users
+func SystemSaveUsers(c *gin.Context) {
+	systemIdStr := c.Param("id")
+
+	// Convertir el ID del sistema
+	var systemID uint
+	if _, err := fmt.Sscanf(systemIdStr, "%d", &systemID); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "ID de sistemas no inválido", "error": err.Error()})
+		return
+	}
+
+	// Leer JSON del cuerpo
+	var req models.SystemUsersCreateRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "No se pueden parsear los datos enviados", "error": err.Error()})
+		return
+	}
+
+	// Conexión a la base de datos
+	if err := configs.ConnectToDB(); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error":   "No se pudo conectar a la base de datos",
+			"message": err.Error(),
+		})
+		return
+	}
+
+	// Iniciar transacción
+	tx := configs.DB.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	response := make([]models.CreatedPermissionResponse, 0)
+
+	// 1. Crear nuevos permissions???
+
+	// 2. Actualizar permissions existentes
+	for _, incoming := range req.Edits {
+		// Buscar si YA EXISTE la relación user <-> system
+		var existing models.SystemUser
+		err := tx.Where("user_id = ? AND system_id = ?", incoming.ID, systemID).
+			First(&existing).Error
+
+		if incoming.Registered {
+			// Queremos que el usuario esté registrado
+			if err != nil {
+				if errors.Is(err, gorm.ErrRecordNotFound) {
+					// No existe → crear
+					newRelation := models.SystemUser{
+						UserID:   incoming.ID,
+						SystemID: systemID,
+						Created:  time.Now(),
+					}
+					if err := tx.Create(&newRelation).Error; err != nil {
+						tx.Rollback()
+						c.JSON(http.StatusInternalServerError, gin.H{
+							"message": "Error al crear la relación",
+							"id":      incoming.ID,
+						})
+						return
+					}
+				} else {
+					tx.Rollback()
+					c.JSON(http.StatusInternalServerError, gin.H{
+						"message": "Error al buscar relación existente",
+						"id":      incoming.ID,
+					})
+					return
+				}
+			}
+		} else {
+			// Queremos que el usuario NO esté registrado
+			if err == nil {
+				// Existe → eliminar
+				if err := tx.Delete(&existing).Error; err != nil {
+					tx.Rollback()
+					c.JSON(http.StatusInternalServerError, gin.H{
+						"message": "Error al eliminar la relación",
+						"id":      incoming.ID,
+					})
+					return
+				}
+			} else if errors.Is(err, gorm.ErrRecordNotFound) {
+				// No existe → ignorar
+			} else {
+				tx.Rollback()
+				c.JSON(http.StatusInternalServerError, gin.H{
+					"message": "Error al buscar relación para eliminar",
+					"id":      incoming.ID,
+				})
+				return
+			}
+		}
+	}
+
+	// 3. Eliminar permissions???
+
+	// Confirmar transacción
+	if err := tx.Commit().Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Error al confirmar cambios", "error": err.Error()})
+		return
+	}
+
+	// Responder con éxito
+	c.JSON(http.StatusOK, response)
 }

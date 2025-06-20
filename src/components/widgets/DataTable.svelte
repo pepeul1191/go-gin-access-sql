@@ -18,6 +18,7 @@
   export let columnNames = [];
   export let columnClasses = [];
   export let columnStyles = [];
+  export let tdStyles = [];
   export let addButton = {
     display: false,
     disabled: false,
@@ -158,6 +159,20 @@
       }
     }
     //console.log(observer)
+  };
+
+  const radioClicked = (event, record, key, newValue) => {
+    record[key] = newValue;
+    var rowKey = event.target.parentElement.parentElement.firstChild.innerHTML;
+    if(String(rowKey).includes('tmp')){
+      if(!observer.new.includes(rowKey)){
+        observer.new.push(rowKey)
+      }
+    }else{
+      if(!observer.edit.includes(rowKey)){
+        observer.edit.push(rowKey)
+      }
+    }
   };
 
   const dataSearch = (key, idSearched) => {
@@ -468,11 +483,18 @@
     {#each data as record}
     <tr>
       {#each columnKeys as key, i}
-        <td class="data-td {columnClasses[i]}" style="{columnStyles[i]}">
+        <td class="data-td {columnClasses[i]}" style="{tdStyles[i]}">
           {#if columnTypes[i] == 'input[text]'}
             <input type="text" key="{key}" on:keydown={inputTextKeyDown} bind:value={record[key]} />
           {:else if columnTypes[i] == 'td-datetime'}
             {record[key]}
+          {:else if columnTypes[i] == 'radiobutton'}
+            <input
+              class="form-check-input"
+              type="checkbox"
+              bind:checked={record[key]}
+              on:change={(event) => radioClicked(event, record, key, record[key])}
+            />
           {:else} <!-- if columnTypes[i] == 'td'} -->
             {record[key]}
           {/if}
