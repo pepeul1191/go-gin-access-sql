@@ -100,7 +100,7 @@
 </style>
 
 <div bind:this={userDetailModal} class="modal fade" tabindex="-1">
-  <div class="modal-dialog modal-lg modal-dialog-centered">
+  <div class="modal-dialog modal-xl modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">{modalTitle}</h5>
@@ -158,7 +158,7 @@
         bind:this={userDataTable}
         fetchURL={BASE_URL + 'apis/v1/systems/' + id + '/users'}
         columnKeys={['id', 'username', 'email', 'registered']}
-        columnTypes={['id', 'td', 'td', 'radiobutton']}
+        columnTypes={['id', 'td', 'td', 'radiobuttonAll']}
         columnNames={['ID', 'Nombre', 'Correo', 'Registrado', 'Acciones']}
         columnStyles={['max-width: 50px;', 'max-width: 250px;', 'max-width: 150px;', '']}
         tdStyles={['', '', '', 'padding-left: 40px;']}

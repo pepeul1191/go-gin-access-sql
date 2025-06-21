@@ -107,7 +107,7 @@
 </style>
 
 <div bind:this={userDetailModal} class="modal fade" tabindex="-1">
-  <div class="modal-dialog modal-lg modal-dialog-centered">
+  <div class="modal-dialog modal-lg modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">{modalTitle}</h5>

@@ -175,6 +175,26 @@
     }
   };
 
+  const radioThClicked = (event, key) => {
+    const isChecked = event.target.checked;
+    //console.log(isChecked);
+    //console.log(key);
+    data.forEach((record) => {
+      record[key] = isChecked;
+      let rowKey = record[recordId]
+      if(isChecked){
+        if(!observer.edit.includes(rowKey)){
+          observer.edit.push(rowKey)
+        }
+      }else{
+        if(!observer.edit.includes(rowKey)){
+          observer.edit.push(rowKey)
+        }
+      }
+    });
+    data = data;
+  };
+
   const dataSearch = (key, idSearched) => {
     for (var i=0; i < data.length; i++) {
       if (data[i][key] == idSearched) {
@@ -405,6 +425,10 @@
     border-color: transparent;
     background-color: transparent;
   }
+
+  th > .form-check-input{
+    margin-left: 10px;
+  }
 </style>
 <!-- modal -->
 <div bind:this={deleteConfirmationModal} class="modal fade" tabindex="-1">
@@ -475,7 +499,18 @@
   <thead>
     <tr>
       {#each columnNames as key, i}
-        <th class="{columnClasses[i]}" style="{columnStyles[i]}" scope="col">{columnNames[i]}</th>
+        {#if columnTypes[i] == 'radiobuttonAll'}
+          <th class="{columnClasses[i]}" style="{columnStyles[i]}" scope="col">
+            {columnNames[i]} 
+            <input
+              class="form-check-input form-check-input-all"
+              type="checkbox"
+              on:change={(event) => radioThClicked(event, columnKeys[i])}
+            />
+          </th>
+        {:else}
+          <th class="{columnClasses[i]}" style="{columnStyles[i]}" scope="col">{columnNames[i]}</th>
+        {/if}
       {/each}
     </tr>
   </thead>
@@ -488,7 +523,7 @@
             <input type="text" key="{key}" on:keydown={inputTextKeyDown} bind:value={record[key]} />
           {:else if columnTypes[i] == 'td-datetime'}
             {record[key]}
-          {:else if columnTypes[i] == 'radiobutton'}
+          {:else if columnTypes[i] == 'radiobutton' || columnTypes[i] == 'radiobuttonAll'}
             <input
               class="form-check-input"
               type="checkbox"
