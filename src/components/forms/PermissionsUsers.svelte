@@ -60,7 +60,7 @@
         action: (record) => {
           //systemDataTable.askToDeleteRow(record, 'id');
           roleId = record.id;
-          permissionsDataTable.fetchURL = BASE_URL + 'apis/v1/roles/' + roleId + '/permissions';
+          permissionsDataTable.fetchURL = BASE_URL + 'apis/v1/systems-permissions/'+ systemId + '/users/' + userId + '/roles/' + record.id;
           permissionsDataTable.saveURL = BASE_URL + 'apis/v1/systems-permissions/'+ systemId + '/users/' + userId;
           permissionsDataTable.list();
           displayPermission = true;

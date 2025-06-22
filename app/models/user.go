@@ -67,6 +67,7 @@ type UserPermissionSystemRequest struct {
 }
 
 type UserPermissionWithRegistrationStatus struct {
-	PermissionID uint `json:"id" gorm:"column:id"`
-	Registered   bool `json:"registered" gorm:"column:registered"`
+	PermissionID uint   `json:"id" gorm:"column:id"`
+	Name         string `json:"name" binding:"required"`
+	Registered   bool   `json:"registered" gorm:"column:registered"`
 }

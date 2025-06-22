@@ -567,3 +567,61 @@ func SystemSavePermissionsUsers(c *gin.Context) {
 	// 7. Responder con éxito
 	c.JSON(http.StatusOK, response)
 }
+
+// GET: /apis/v1/systems-permissions/:system_id/users/:user_id
+func SystemPermissionFetchUsers(c *gin.Context) {
+	var permissions []models.UserPermissionWithRegistrationStatus
+
+	systemIdStr := c.Param("system_id")
+	var systemID uint
+	if _, err := fmt.Sscanf(systemIdStr, "%d", &systemID); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "ID de sistema inválido"})
+		return
+	}
+
+	idUserStr := c.Param("user_id")
+	var userID uint
+	if _, err := fmt.Sscanf(idUserStr, "%d", &userID); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "ID de sistema inválido"})
+		return
+	}
+
+	idRoleStr := c.Param("role_id")
+	var roleID uint
+	if _, err := fmt.Sscanf(idRoleStr, "%d", &roleID); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "ID de sistema inválido"})
+		return
+	}
+
+	// Conexión a DB (asegúrate de que esto devuelva un *gorm.DB válido)
+	if err := configs.ConnectToDB(); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error":   "Conexión fallida",
+			"message": err.Error(),
+		})
+		return
+	}
+
+	// Construimos la parte base de la consulta
+	baseQuery := `
+		SELECT 
+			P.id,
+			P.name,
+			CASE WHEN SU.system_id IS NOT NULL THEN TRUE ELSE FALSE END AS registered
+		FROM permissions P
+		LEFT JOIN systems_users_permissions SU ON P.id = SU.permission_id AND SU.system_id = ? AND SU.user_id = ?
+		INNER JOIN roles R ON R.id = P.role_id 
+		WHERE R.id = ?`
+
+	// 4. Ejecutar consulta
+	if err := configs.DB.Raw(baseQuery, systemID, userID, roleID).Scan(&permissions).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error":   "Error al obtener permisos",
+			"message": err.Error(),
+		})
+		return
+	}
+
+	// Respuesta
+	c.JSON(http.StatusOK, permissions)
+}
