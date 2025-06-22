@@ -53,7 +53,7 @@
   }
 
   const showUsers = (system) => {
-    navigate(`/systems/${system.id}/users`);
+    navigate(`/systems/${system.id}/users?name=${system.name}`);
   }
 
   const handleSearchFilter = (event) => {

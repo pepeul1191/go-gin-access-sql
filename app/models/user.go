@@ -58,3 +58,15 @@ type UserWithRegistrationStatus struct {
 	Email      string `json:"email" gorm:"column:email"`
 	Registered bool   `json:"registered" gorm:"column:registered"`
 }
+
+type UserPermissionSystemRequest struct {
+	//News    []IncomingRole         `json:"news"`
+	Edits []UserPermissionWithRegistrationStatus `json:"edits"` // o puedes ignorar si no las usas aún
+	//Deletes []uint `json:"deletes"`
+	//Extra   map[string]interface{} `json:"extra"`
+}
+
+type UserPermissionWithRegistrationStatus struct {
+	PermissionID uint `json:"id" gorm:"column:id"`
+	Registered   bool `json:"registered" gorm:"column:registered"`
+}

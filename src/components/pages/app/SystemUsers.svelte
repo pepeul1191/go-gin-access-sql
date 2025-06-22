@@ -1,10 +1,11 @@
 <script>
   import { onMount } from 'svelte';
+  import { useLocation } from "svelte-routing";
   import { Modal } from 'bootstrap';
   import DataTable from '../../widgets/DataTable.svelte';
   import UserDetail from '../../forms/UserDetail.svelte';
 	import SystemUsersFilters from '../../forms/SystemUsersFilters.svelte';
-	import RolePermission from '../../forms/RolePermission.svelte';
+	import PermissionsUsers from '../../forms/PermissionsUsers.svelte';
   
   let userDetailModalInstance;
   let userFormInstance;
@@ -16,10 +17,10 @@
   export let id = null;
   let userDataTable;
   let modalTitle;
-
-  let rolePermissionModalInstance;
-  let rolePermissionModal;
-  let rolePermissionFormInstance;
+  let name = '';
+  let permissionsUsersModalInstance;
+  let permissionsUsersModal;
+  let permissionsUsersFormInstance;
 
   const addUser = () => {
     modalTitle = 'Agregar Usuario'
@@ -38,11 +39,11 @@
     modalTitle = 'Editar Usuario';
   };
 
-  const editUser = (user) => {
-    modalTitle = 'Editar Usuario'
-    userFormInstance.clean();
-    userFormInstance.loadUser(user);
-    userDetailModalInstance.show();
+  const assignPermissions = (user) => {
+    console.log(user)
+    modalTitle = `Asignar Permisos al Usuario ${user.username}`;
+    permissionsUsersModalInstance.show();
+    permissionsUsersFormInstance.set(id, user.id);
   }
 
   const handleSearchFilter = (event) => {
@@ -66,7 +67,7 @@
     }, 4300);
   }
 
-  const handleRolePermissionSave = (event) => {
+  const handleUserPermissionsSave = (event) => {
 
   }
 
@@ -79,19 +80,24 @@
       //userDataTable.addButton.action = () => userDataTable.openTab(BASE_URL + 'hola');
     
     userDetailModalInstance = new Modal(userDetailModal);
-    rolePermissionModalInstance = new Modal(rolePermissionModal);
+    permissionsUsersModalInstance = new Modal(permissionsUsersModal);
     userDetailModal.addEventListener('hidden.bs.modal', handleClose);
-    rolePermissionModal.addEventListener('hidden.bs.modal', () => {});
+    permissionsUsersModal.addEventListener('hidden.bs.modal', () => {});
     // table action buttons
     userDataTable.actionButtons = [
       {
         class: 'btn-secondary',
         icon: 'fa-list',
         label: 'Asignar Permisos',
-        action: editUser
+        action: assignPermissions
       },
     ];
     userDataTable.list();
+    const queryString = window.location.search;
+    if (queryString) {
+      const params = new URLSearchParams(queryString);
+      name = params.get("name");
+    }
   });
 </script>
 
@@ -115,17 +121,17 @@
   </div>
 </div>
 
-<div bind:this={rolePermissionModal} class="modal fade" tabindex="-1">
-  <div class="modal-dialog modal-xl modal-dialog">
+<div bind:this={permissionsUsersModal} class="modal fade" tabindex="-1">
+  <div class="modal-dialog modal-lg modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">{modalTitle}</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
       </div>
       <div class="modal-body">
-        <RolePermission 
-          bind:this={rolePermissionFormInstance} 
-          on:saved={handleRolePermissionSave} />
+        <PermissionsUsers 
+          bind:this={permissionsUsersFormInstance} 
+          on:saved={handleUserPermissionsSave} />
       </div>
     </div>
   </div>
@@ -133,7 +139,7 @@
 
 <div class="container my-2">
   <div class="row">
-    <h1 class="mb-2 subtitle">Usuarios del Sistema - {id}</h1>
+    <h1 class="mb-2 subtitle">Usuarios del Sistema - {name}</h1>
   </div>
   <hr>
   <div class="row subtitle-row">

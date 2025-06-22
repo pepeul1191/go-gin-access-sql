@@ -437,3 +437,133 @@ func SystemSaveUsers(c *gin.Context) {
 	// Responder con éxito
 	c.JSON(http.StatusOK, response)
 }
+
+// POST: /apis/v1/systems/:system_id/users/:user_id
+func SystemSavePermissionsUsers(c *gin.Context) {
+	// 1. Validar y convertir IDs
+	systemID, err := strconv.ParseUint(c.Param("system_id"), 10, 32)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "ID de sistema inválido",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	userID, err := strconv.ParseUint(c.Param("user_id"), 10, 32)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "ID de usuario inválido",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	// 2. Parsear el cuerpo JSON
+	var req models.UserPermissionSystemRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "Error al parsear los datos",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	// 3. Conectar a la base de datos
+	if err := configs.ConnectToDB(); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Error de conexión a la base de datos",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	// 4. Iniciar transacción
+	tx := configs.DB.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	// 5. Procesar cada edición
+	response := make([]models.CreatedPermissionResponse, 0)
+
+	for _, incoming := range req.Edits {
+		var existing models.SystemUserPermission
+		err := tx.Where("permission_id = ? AND user_id = ? AND system_id = ?",
+			incoming.PermissionID, uint(userID), uint(systemID)).
+			First(&existing).Error
+
+		if incoming.Registered {
+			// Caso: Debe existir la relación
+			if err != nil {
+				if errors.Is(err, gorm.ErrRecordNotFound) {
+					// Crear nueva relación
+					newRelation := models.SystemUserPermission{
+						UserID:       uint(userID),
+						SystemID:     uint(systemID),
+						PermissionID: incoming.PermissionID,
+						Created:      time.Now(),
+					}
+
+					if err := tx.Create(&newRelation).Error; err != nil {
+						tx.Rollback()
+						c.JSON(http.StatusInternalServerError, gin.H{
+							"message": "Error al crear relación de permiso",
+							"error":   err.Error(),
+							"details": fmt.Sprintf("system_id: %d, user_id: %d, permission_id: %d",
+								systemID, userID, incoming.PermissionID),
+						})
+						return
+					}
+				} else {
+					tx.Rollback()
+					c.JSON(http.StatusInternalServerError, gin.H{
+						"message": "Error al verificar permiso existente",
+						"error":   err.Error(),
+					})
+					return
+				}
+			}
+		} else {
+			// Caso: NO debe existir la relación
+			if err == nil {
+				// Eliminar relación existente
+				deleteResult := tx.Where("user_id = ? AND system_id = ? AND permission_id = ?",
+					userID, systemID, incoming.PermissionID).
+					Delete(&models.SystemUserPermission{}).Error
+				if deleteResult != nil {
+					tx.Rollback()
+					c.JSON(http.StatusInternalServerError, gin.H{
+						"message": "Error al eliminar relación de permiso",
+						"error":   deleteResult.Error(),
+						"details": fmt.Sprintf("system_id: %d, user_id: %d, permission_id: %d",
+							systemID, userID, incoming.PermissionID),
+					})
+					return
+				}
+			} else if !errors.Is(err, gorm.ErrRecordNotFound) {
+				tx.Rollback()
+				c.JSON(http.StatusInternalServerError, gin.H{
+					"message": "Error al verificar permiso para eliminar",
+					"error":   err.Error(),
+				})
+				return
+			}
+			// Si no existe, no hacemos nada
+		}
+	}
+
+	// 6. Confirmar transacción
+	if err := tx.Commit().Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Error al confirmar cambios",
+			"error":   err.Error(),
+		})
+		return
+	}
+
+	// 7. Responder con éxito
+	c.JSON(http.StatusOK, response)
+}

@@ -17,3 +17,10 @@ type SystemUsersCreateRequest struct {
 	//Deletes []uint                       `json:"deletes"`
 	//Extra   map[string]interface{}       `json:"extra"`
 }
+
+type SystemUsersPermissionsCreateRequest struct {
+	//News    []IncomingPermission   `json:"news"`
+	Edits []UserPermissionWithRegistrationStatus `json:"edits"` // o puedes ignorar si no las usas aún
+	//Deletes []uint                       `json:"deletes"`
+	//Extra   map[string]interface{}       `json:"extra"`
+}

@@ -27,6 +27,7 @@ func setupRoutes(r *gin.Engine) {
 	r.GET("/apis/v1/systems/:id/roles", configs.APIAuthRequired(), controllers.SystemFetchRoles)
 	r.GET("/apis/v1/systems/:id/users", configs.APIAuthRequired(), controllers.SystemFetchUsers)
 	r.POST("/apis/v1/systems/:id/users", configs.APIAuthRequired(), controllers.SystemSaveUsers)
+	r.POST("/apis/v1/systems-permissions/:system_id/users/:user_id", configs.APIAuthRequired(), controllers.SystemSavePermissionsUsers)
 	// roles controller
 	r.POST("/apis/v1/roles/:system-id", configs.APIAuthRequired(), controllers.SaveRoles)
 	r.GET("/apis/v1/roles/:id/permissions", configs.APIAuthRequired(), controllers.RoleFetchPermissions)

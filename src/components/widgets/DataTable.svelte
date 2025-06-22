@@ -64,7 +64,7 @@
     // list();
     deleteConfirmationInstance = new Modal(deleteConfirmationModal);
     //console.log(addButton)
-    console.log(pagination)
+    //console.log(pagination)
   });
 
   export const askToDeleteRow = (record, key) => {
