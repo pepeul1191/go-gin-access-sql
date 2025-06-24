@@ -45,3 +45,10 @@ func APIAuthRequired() gin.HandlerFunc {
 		c.Next()
 	}
 }
+
+func ExtAPIAuthRequired() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// TODO
+		c.Next()
+	}
+}

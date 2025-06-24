@@ -1,0 +1,13 @@
+@baseUrl = http://localhost:8080
+@session = mysession=MTc0OTg1Nzc5MHxEWDhFQVFMX2dBQUJFQUVRQUFBb180QUFBUVp6ZEhKcGJtY01DQUFHYzNSaGRIVnpCbk4wY21sdVp3d0tBQWhoWTNScGRtRjBaUT09fMsOMrySaZXb7iVqWPzRGdBZzMNWzsX53YvrKgdxuykg
+
+### Crear usuario
+POST {{baseUrl}}/api/v1/sign-in
+Content-Type: application/json
+Cookie: {{session}}
+
+{
+  "username": "david75",
+  "password": "123",
+  "system_id": 1
+}

@@ -42,16 +42,28 @@ CREATE TABLE systems_users (
   FOREIGN KEY(system_id) REFERENCES systems(id),
   FOREIGN KEY(user_id) REFERENCES users(id)
 );
-CREATE TABLE systems_user_permissions (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  system_id INTEGER NOT NULL,
-  user_id INTEGER NOT NULL,
-  permission_id INTEGER NOT NULL,
-  created DATETIME NOT NULL,
-  FOREIGN KEY(system_id) REFERENCES systems(id),
-  FOREIGN KEY(user_id) REFERENCES users(id),
-  FOREIGN KEY(permission_id) REFERENCES permissions(id)
+CREATE TABLE IF NOT EXISTS "systems_users_permissions" (
+	"id"	INTEGER,
+	"system_id"	INTEGER NOT NULL,
+	"user_id"	INTEGER NOT NULL,
+	"permission_id"	INTEGER NOT NULL,
+	"created"	DATETIME NOT NULL,
+	PRIMARY KEY("id" AUTOINCREMENT),
+	FOREIGN KEY("system_id") REFERENCES "systems"("id"),
+	FOREIGN KEY("user_id") REFERENCES "users"("id"),
+	FOREIGN KEY("permission_id") REFERENCES "permissions"("id")
 );
+CREATE VIEW vw_system_users AS
+SELECT
+    SU.user_id AS id,
+    SU.system_id,
+    U.username,
+    U.password,
+    U.email,
+    U.activated
+FROM systems_users SU
+INNER JOIN users U ON SU.user_id = U.id
+/* vw_system_users(id,system_id,username,password,email,activated) */;
 -- Dbmate schema migrations
 INSERT INTO "schema_migrations" (version) VALUES
   ('20250607174507'),
@@ -61,4 +73,5 @@ INSERT INTO "schema_migrations" (version) VALUES
   ('20250607174542'),
   ('20250607174552'),
   ('20250607175027'),
-  ('20250607175057');
+  ('20250607175057'),
+  ('20250624051821');

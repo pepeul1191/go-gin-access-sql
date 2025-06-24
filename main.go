@@ -20,6 +20,7 @@ func setupRoutes(r *gin.Engine) {
 	r.GET("/login", configs.ViewAuthGoToHome(), controllers.LoginIndex)
 	r.POST("/login", controllers.LoginSignIn)
 	r.GET("/sign-out", controllers.LoginSignOut)
+	r.POST("/api/v1/sign-in", configs.ExtAPIAuthRequired(), controllers.LoginExtSignIn)
 	// system controller
 	r.GET("/api/v1/systems", configs.APIAuthRequired(), controllers.SystemFetchAll)
 	r.POST("/api/v1/systems", configs.APIAuthRequired(), controllers.SystemCreate)
