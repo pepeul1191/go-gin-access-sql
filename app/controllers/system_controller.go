@@ -25,11 +25,8 @@ func SystemFetchAll(c *gin.Context) {
 	step := c.Query("step")
 	page := c.Query("page")
 	// Conexión a la base de datos
-	if err := configs.ConnectToDB(); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error":   "No se pudo conectar a la base de datos",
-			"message": err.Error(),
-		})
+	if configs.DB == nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Conexión DB no inicializada"})
 		return
 	}
 	// Comenzar la consulta
@@ -104,8 +101,8 @@ func SystemCreate(c *gin.Context) {
 	// Establecer fechas (si no se hace en frontend)
 	system.Created = time.Now()
 	system.Updated = time.Now()
-	if err := configs.ConnectToDB(); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Conexión fallida", "message": err.Error()})
+	if configs.DB == nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Conexión DB no inicializada"})
 		return
 	}
 	if err := configs.DB.Create(&system).Error; err != nil {
@@ -119,8 +116,8 @@ func SystemCreate(c *gin.Context) {
 func SystemUpdate(c *gin.Context) {
 	id := c.Param("id")
 	var system models.System
-	if err := configs.ConnectToDB(); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Conexión fallida", "message": err.Error()})
+	if configs.DB == nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Conexión DB no inicializada"})
 		return
 	}
 	// Buscar el sistema existente

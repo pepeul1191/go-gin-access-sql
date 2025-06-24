@@ -3,6 +3,7 @@ package main
 import (
 	"access/app/configs"
 	"access/app/controllers"
+	"log"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
@@ -50,6 +51,10 @@ func setupRoutes(r *gin.Engine) {
 
 func main() {
 	r := gin.Default()
+	// load db
+	if err := configs.ConnectToDB(); err != nil {
+		log.Fatal("Error al iniciar DB:", err)
+	}
 	// settings
 	r.LoadHTMLGlob("views/*")
 	r.Static("/static", "./public")

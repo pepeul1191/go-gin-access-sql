@@ -21,11 +21,8 @@ func UserFetchAll(c *gin.Context) {
 	step := c.Query("step")
 	page := c.Query("page")
 	// Conexión a la base de datos
-	if err := configs.ConnectToDB(); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error":   "No se pudo conectar a la base de datos",
-			"message": err.Error(),
-		})
+	if configs.DB == nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Conexión DB no inicializada"})
 		return
 	}
 	// Comenzar la consulta
@@ -99,11 +96,8 @@ func UserCreate(c *gin.Context) {
 		return
 	}
 	// Conexión a la base de datos
-	if err := configs.ConnectToDB(); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error":   "No se pudo conectar a la base de datos",
-			"message": err.Error(),
-		})
+	if configs.DB == nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Conexión DB no inicializada"})
 		return
 	}
 	// veficar si existe usuario y correo en uso
@@ -142,11 +136,8 @@ func UserFetchOne(c *gin.Context) {
 	id := c.Param("id")
 	var user models.User
 	// Conexión a la base de datos
-	if err := configs.ConnectToDB(); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error":   "No se pudo conectar a la base de datos",
-			"message": err.Error(),
-		})
+	if configs.DB == nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Conexión DB no inicializada"})
 		return
 	}
 	// Buscar el sistema existente
@@ -169,11 +160,8 @@ func UserUpdatePassword(c *gin.Context) {
 		return
 	}
 	// Conexión a la base de datos
-	if err := configs.ConnectToDB(); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error":   "No se pudo conectar a la base de datos",
-			"message": err.Error(),
-		})
+	if configs.DB == nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Conexión DB no inicializada"})
 		return
 	}
 	// Buscar el sistema existente
@@ -197,11 +185,8 @@ func UserUpdateActivationKey(c *gin.Context) {
 	id := c.Param("id")
 	var user models.User
 	// Conexión a la base de datos
-	if err := configs.ConnectToDB(); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error":   "No se pudo conectar a la base de datos",
-			"message": err.Error(),
-		})
+	if configs.DB == nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Conexión DB no inicializada"})
 		return
 	}
 	// Buscar el sistema existente
@@ -226,11 +211,8 @@ func UserUpdateResetKey(c *gin.Context) {
 	var user models.User
 	// Parsear JSON recibido
 	// Conexión a la base de datos
-	if err := configs.ConnectToDB(); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error":   "No se pudo conectar a la base de datos",
-			"message": err.Error(),
-		})
+	if configs.DB == nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Conexión DB no inicializada"})
 		return
 	}
 	// Buscar el sistema existente
@@ -260,11 +242,8 @@ func UserUpdateActivated(c *gin.Context) {
 		return
 	}
 	// Conexión a la base de datos
-	if err := configs.ConnectToDB(); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error":   "No se pudo conectar a la base de datos",
-			"message": err.Error(),
-		})
+	if configs.DB == nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Conexión DB no inicializada"})
 		return
 	}
 	// Buscar el sistema existente
@@ -293,11 +272,8 @@ func UserUpdate(c *gin.Context) {
 		return
 	}
 	// Conexión a la base de datos
-	if err := configs.ConnectToDB(); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error":   "No se pudo conectar a la base de datos",
-			"message": err.Error(),
-		})
+	if configs.DB == nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Conexión DB no inicializada"})
 		return
 	}
 	// Buscar el sistema existente
