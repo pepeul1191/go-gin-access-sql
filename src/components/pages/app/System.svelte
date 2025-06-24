@@ -186,7 +186,7 @@
   <div class="container">
     <DataTable 
       bind:this={systemDataTable}
-      fetchURL={BASE_URL + 'apis/v1/systems'}
+      fetchURL={BASE_URL + 'api/v1/systems'}
       columnKeys={['id', 'name', 'description']}
       columnTypes={['id', 'td', 'td']}
       columnNames={['ID', 'Nombre', 'Descripción', 'Acciones']}

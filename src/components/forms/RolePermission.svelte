@@ -17,7 +17,7 @@
   export const setSystemId = (system) => {
     console.log(system)
     systemId = system.id;
-    rolesDataTable.fetchURL = BASE_URL + 'apis/v1/systems/' + systemId + '/roles';
+    rolesDataTable.fetchURL = BASE_URL + 'api/v1/systems/' + systemId + '/roles';
     rolesDataTable.list();
     displayPermission = false;
   }
@@ -53,8 +53,8 @@
         action: (record) => {
           //systemDataTable.askToDeleteRow(record, 'id');
           roleId = record.id;
-          permissionsDataTable.fetchURL = BASE_URL + 'apis/v1/roles/' + roleId + '/permissions';
-          permissionsDataTable.saveURL = BASE_URL + 'apis/v1/permissions/' + roleId;
+          permissionsDataTable.fetchURL = BASE_URL + 'api/v1/roles/' + roleId + '/permissions';
+          permissionsDataTable.saveURL = BASE_URL + 'api/v1/permissions/' + roleId;
           permissionsDataTable.list();
           displayPermission = true;
         }
@@ -104,8 +104,8 @@
     </div>
     <DataTable 
       bind:this={rolesDataTable}
-      fetchURL={BASE_URL + 'apis/v1/systems/' + systemId + '/roles'}
-      saveURL={BASE_URL + 'apis/v1/roles/' + systemId}
+      fetchURL={BASE_URL + 'api/v1/systems/' + systemId + '/roles'}
+      saveURL={BASE_URL + 'api/v1/roles/' + systemId}
       columnKeys={['id', 'name', ]}
       columnTypes={['id', 'input[text]', ]}
       columnNames={['ID', 'Nombre', 'Acciones']}
@@ -144,8 +144,8 @@
       <h4 class="subtitle">Lista de Permisos del Rol</h4>
       <DataTable 
         bind:this={permissionsDataTable}
-        fetchURL={BASE_URL + 'apis/v1/roles/' + permissionId + '/permissions'}
-        saveURL={BASE_URL + 'apis/v1/permission/' + roleId}
+        fetchURL={BASE_URL + 'api/v1/roles/' + permissionId + '/permissions'}
+        saveURL={BASE_URL + 'api/v1/permission/' + roleId}
         columnKeys={['id', 'name', ]}
         columnTypes={['id', 'input[text]', ]}
         columnNames={['ID', 'Nombre', 'Acciones']}

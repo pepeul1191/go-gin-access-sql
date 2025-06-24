@@ -68,7 +68,7 @@
       let response;
       btnDisabled = true;
       if(id == null){
-        response = await axios.post(BASE_URL + 'apis/v1/systems', formData, {
+        response = await axios.post(BASE_URL + 'api/v1/systems', formData, {
           headers: {
             'Content-Type': 'application/json',
           },
@@ -81,7 +81,7 @@
         // notificar al padre que se ha actualizado algo
         cleanMessage(true);
       }else{
-        response = await axios.put(BASE_URL + 'apis/v1/systems', formData, {
+        response = await axios.put(BASE_URL + 'api/v1/systems', formData, {
           headers: {
             'Content-Type': 'application/json',
           },

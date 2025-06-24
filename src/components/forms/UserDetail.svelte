@@ -102,7 +102,7 @@
         email: user.email
       };
       if(user.id == null){
-        response = await axios.post(BASE_URL + 'apis/v1/users', formData, {
+        response = await axios.post(BASE_URL + 'api/v1/users', formData, {
           headers: {
             'Content-Type': 'application/json',
           },
@@ -114,7 +114,7 @@
         btnsDisabled = false;
         cleanMessage(true);
       }else{
-        response = await axios.put(BASE_URL + 'apis/v1/users/' + user.id, formData, {
+        response = await axios.put(BASE_URL + 'api/v1/users/' + user.id, formData, {
           headers: {
             'Content-Type': 'application/json',
           },
@@ -154,7 +154,7 @@
         const formData = {
           password: user.password,
         };
-        response = await axios.put(BASE_URL + 'apis/v1/users/' + user.id + '/password', formData, {
+        response = await axios.put(BASE_URL + 'api/v1/users/' + user.id + '/password', formData, {
           headers: {
             'Content-Type': 'application/json',
           },
@@ -187,7 +187,7 @@
       if(user.id != null){
         const formData = {
         };
-        response = await axios.put(BASE_URL + 'apis/v1/users/' + user.id + '/activation-key', formData, {
+        response = await axios.put(BASE_URL + 'api/v1/users/' + user.id + '/activation-key', formData, {
           headers: {
             'Content-Type': 'application/json',
           },
@@ -220,7 +220,7 @@
       if(user.id != null){
         const formData = {
         };
-        response = await axios.put(BASE_URL + 'apis/v1/users/' + user.id + '/reset-key', formData, {
+        response = await axios.put(BASE_URL + 'api/v1/users/' + user.id + '/reset-key', formData, {
           headers: {
             'Content-Type': 'application/json',
           },
@@ -255,7 +255,7 @@
         const formData = {
           activated: newStatus
         };
-        response = await axios.put(BASE_URL + 'apis/v1/users/' + user.id + '/activated', formData, {
+        response = await axios.put(BASE_URL + 'api/v1/users/' + user.id + '/activated', formData, {
           headers: {
             'Content-Type': 'application/json',
           },
