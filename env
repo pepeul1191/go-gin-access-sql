@@ -1,1 +1,3 @@
 DB=sqlite:db/app.db
+JWT_SECRET=k8sT!mZ$4KpQbR7sCv2EaXw&9LpQ
+DATABASE_URL=db/app.db
