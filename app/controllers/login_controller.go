@@ -4,9 +4,11 @@ import (
 	"access/app/configs"
 	"access/app/models"
 	"net/http"
+	"time"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v5"
 )
 
 func LoginIndex(c *gin.Context) {
@@ -51,6 +53,32 @@ func LoginExtSignIn(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"message": "Usuario no encontrado", "error": err.Error()})
 		return
 	}
+
+	// 🔐 Generar el JWT
+	expirationTime := time.Now().Add(1 * time.Hour)
+
+	claims := &models.Claims{
+		Username: existingUser.Username,
+		Email:    existingUser.Email,
+		UserID:   existingUser.ID,
+		SystemID: req.SystemID,
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(expirationTime),
+			IssuedAt:  jwt.NewNumericDate(time.Now()),
+			Issuer:    "tu-app",
+			Audience:  []string{"clientes"},
+		},
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	jwtKey := []byte("tu_clave_secreta_aqui") // Mejor guárdala en variables de entorno
+
+	signedToken, err := token.SignedString(jwtKey)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Error al generar el token", "error": err.Error()})
+		return
+	}
+
 	// armar respuesta
 	if existingUser.Activated {
 		var userLogged models.ExtSystemUsersOutput
@@ -58,6 +86,7 @@ func LoginExtSignIn(c *gin.Context) {
 		userLogged.Username = existingUser.Username
 		userLogged.SystemID = req.SystemID
 		userLogged.ID = existingUser.ID
+		userLogged.Token = signedToken
 		// devolver datos de usuario
 		c.JSON(http.StatusOK, userLogged)
 	} else {

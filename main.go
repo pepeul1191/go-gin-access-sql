@@ -11,6 +11,8 @@ import (
 )
 
 func setupRoutes(r *gin.Engine) {
+	// Cargar .env al iniciar la app
+	configs.LoadEnv()
 	// home controller
 	r.GET("/", configs.ViewAuthRequired(), controllers.HomeIndex)
 	r.GET("/systems", configs.ViewAuthRequired(), controllers.HomeIndex)

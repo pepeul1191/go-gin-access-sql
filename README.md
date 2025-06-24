@@ -46,6 +46,8 @@ Instalar dependencias de go:
     $ go get -u gorm.io/driver/sqlite
     $ go get github.com/gin-contrib/sessions
     $ go get github.com/gin-contrib/sessions/cookie
+    $ go get -u github.com/golang-jwt/jwt/v5
+    $ go get github.com/joho/godotenv/cmd/godotenv
 
 ### Antes de usar los scripts
 

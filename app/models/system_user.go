@@ -38,4 +38,5 @@ type ExtSystemUsersOutput struct {
 	SystemID uint   `json:"system_id"`
 	Username string `json:"username" binding:"required"`
 	Email    string `json:"email" binding:"required"`
+	Token    string `json:"token"`
 }
