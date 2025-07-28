@@ -58,6 +58,7 @@ func LoginExtSignInByUsername(c *gin.Context) {
 	expirationTime := time.Now().Add(1 * time.Hour)
 
 	claims := &models.Claims{
+		Role:     "external",
 		Username: existingUser.Username,
 		Email:    existingUser.Email,
 		UserID:   existingUser.ID,
@@ -119,6 +120,7 @@ func LoginExtSignInByEmail(c *gin.Context) {
 	expirationTime := time.Now().Add(1 * time.Hour)
 
 	claims := &models.Claims{
+		Role:     "external",
 		Username: existingUser.Username,
 		Email:    existingUser.Email,
 		UserID:   existingUser.ID,
@@ -153,6 +155,34 @@ func LoginExtSignInByEmail(c *gin.Context) {
 	} else {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Cuenta de usuario no activa", "error": "activated = false"})
 	}
+}
+
+func AdminSignInByHeader(c *gin.Context) {
+	// 🔐 Generar el JWT
+	expirationTime := time.Now().Add(1 * time.Hour)
+
+	claims := &models.AdminClaims{
+		Role:     "admin",
+		Username: "admin",
+		Email:    "admin@gmail.com",
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(expirationTime),
+			IssuedAt:  jwt.NewNumericDate(time.Now()),
+			Issuer:    "tu-app",
+			Audience:  []string{"clientes"},
+		},
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	jwtKey := []byte(configs.JWTSecretKey) // Mejor guárdala en variables de entorno
+
+	signedToken, err := token.SignedString(jwtKey)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Error al generar el token", "error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, signedToken)
 }
 
 func LoginSignOut(c *gin.Context) {

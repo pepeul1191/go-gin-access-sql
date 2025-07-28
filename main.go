@@ -5,6 +5,9 @@ import (
 	"access/app/controllers"
 	"log"
 
+	"time"
+
+	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
@@ -24,31 +27,32 @@ func setupRoutes(r *gin.Engine) {
 	r.GET("/sign-out", controllers.LoginSignOut)
 	r.POST("/api/v1/sign-in/by-username", configs.ExtAPIAuthRequired(), controllers.LoginExtSignInByUsername)
 	r.POST("/api/v1/sign-in/by-email", configs.ExtAPIAuthRequired(), controllers.LoginExtSignInByEmail)
+	r.POST("/api/v1/sign-in/admin", configs.AdminAPIAuthRequired(), controllers.AdminSignInByHeader)
 	// system controller
-	r.GET("/api/v1/systems", configs.APIAuthRequired(), controllers.SystemFetchAll)
-	r.POST("/api/v1/systems", configs.APIAuthRequired(), controllers.SystemCreate)
-	r.PUT("/api/v1/systems", configs.APIAuthRequired(), controllers.SystemUpdate)
-	r.DELETE("/api/v1/systems/:id", configs.APIAuthRequired(), controllers.SystemDelete)
-	r.GET("/api/v1/systems/:id/roles", configs.APIAuthRequired(), controllers.SystemFetchRoles)
-	r.GET("/api/v1/systems/:id/users", configs.APIAuthRequired(), controllers.SystemFetchUsers)
-	r.POST("/api/v1/systems/:id/users", configs.APIAuthRequired(), controllers.SystemSaveUsers)
-	r.POST("/api/v1/systems-permissions/:system_id/users/:user_id", configs.APIAuthRequired(), controllers.SystemSavePermissionsUsers)
-	r.GET("/api/v1/systems-permissions/:system_id/users/:user_id/roles/:role_id", configs.APIAuthRequired(), controllers.SystemPermissionFetchUsers)
+	r.GET("/api/v1/systems", configs.RequireAdminJWT(), controllers.SystemFetchAll)
+	r.POST("/api/v1/systems", configs.RequireAdminJWT(), controllers.SystemCreate)
+	r.PUT("/api/v1/systems", configs.RequireAdminJWT(), controllers.SystemUpdate)
+	r.DELETE("/api/v1/systems/:id", configs.RequireAdminJWT(), controllers.SystemDelete)
+	r.GET("/api/v1/systems/:id/roles", configs.RequireAdminJWT(), controllers.SystemFetchRoles)
+	r.GET("/api/v1/systems/:id/users", configs.RequireAdminJWT(), controllers.SystemFetchUsers)
+	r.POST("/api/v1/systems/:id/users", configs.RequireAdminJWT(), controllers.SystemSaveUsers)
+	r.POST("/api/v1/systems-permissions/:system_id/users/:user_id", configs.RequireAdminJWT(), controllers.SystemSavePermissionsUsers)
+	r.GET("/api/v1/systems-permissions/:system_id/users/:user_id/roles/:role_id", configs.RequireAdminJWT(), controllers.SystemPermissionFetchUsers)
 	// roles controller
-	r.POST("/api/v1/roles/:system-id", configs.APIAuthRequired(), controllers.SaveRoles)
-	r.GET("/api/v1/roles/:id/permissions", configs.APIAuthRequired(), controllers.RoleFetchPermissions)
+	r.POST("/api/v1/roles/:system-id", configs.RequireAdminJWT(), controllers.SaveRoles)
+	r.GET("/api/v1/roles/:id/permissions", configs.RequireAdminJWT(), controllers.RoleFetchPermissions)
 	// permissions controller
-	r.POST("/api/v1/permissions/:role-id", configs.APIAuthRequired(), controllers.SavePermissions)
+	r.POST("/api/v1/permissions/:role-id", configs.RequireAdminJWT(), controllers.SavePermissions)
 	// user controller
-	r.GET("/api/v1/users", configs.APIAuthRequired(), controllers.UserFetchAll)
-	r.GET("/api/v1/users/:id", configs.APIAuthRequired(), controllers.UserFetchOne)
-	r.POST("/api/v1/users", configs.APIAuthRequired(), controllers.UserCreate)
-	r.PUT("/api/v1/users/:id", configs.APIAuthRequired(), controllers.UserUpdate)
-	r.PUT("/api/v1/users/:id/password", configs.APIAuthRequired(), controllers.UserUpdatePassword)
-	r.PUT("/api/v1/users/:id/activation-key", configs.APIAuthRequired(), controllers.UserUpdateActivationKey)
-	r.PUT("/api/v1/users/:id/reset-key", configs.APIAuthRequired(), controllers.UserUpdateResetKey)
-	r.PUT("/api/v1/users/:id/activated", configs.APIAuthRequired(), controllers.UserUpdateActivated)
-	//r.DELETE("/api/v1/users/:id", configs.APIAuthRequired(), controllers.UserDelete) TODO
+	r.GET("/api/v1/users", configs.RequireAdminJWT(), controllers.UserFetchAll)
+	r.GET("/api/v1/users/:id", configs.RequireAdminJWT(), controllers.UserFetchOne)
+	r.POST("/api/v1/users", configs.RequireAdminJWT(), controllers.UserCreate)
+	r.PUT("/api/v1/users/:id", configs.RequireAdminJWT(), controllers.UserUpdate)
+	r.PUT("/api/v1/users/:id/password", configs.RequireAdminJWT(), controllers.UserUpdatePassword)
+	r.PUT("/api/v1/users/:id/activation-key", configs.RequireAdminJWT(), controllers.UserUpdateActivationKey)
+	r.PUT("/api/v1/users/:id/reset-key", configs.RequireAdminJWT(), controllers.UserUpdateResetKey)
+	r.PUT("/api/v1/users/:id/activated", configs.RequireAdminJWT(), controllers.UserUpdateActivated)
+	//r.DELETE("/api/v1/users/:id", configs.RequireAdminJWT(), controllers.UserDelete) TODO
 	// error controller
 	r.NoRoute(controllers.Error404)
 }
@@ -61,6 +65,16 @@ func main() {
 		c.Header("Server", "Ubuntu")
 		c.Next()
 	})
+	// cors
+	// Middleware CORS
+	r.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"http://localhost:3000", "https://tudominio.com"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+		MaxAge:           12 * time.Hour,
+	}))
 	// load db
 	if err := configs.ConnectToDB(); err != nil {
 		log.Fatal("Error al iniciar DB:", err)
