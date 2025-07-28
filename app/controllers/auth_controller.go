@@ -4,6 +4,7 @@ import (
 	"access/app/configs"
 	"access/app/models"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -160,4 +161,31 @@ func AdminSignInByHeader(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, signedToken)
+}
+
+func ViewToken(c *gin.Context) {
+	tokenString := c.GetHeader("token") // o "Authorization" si usas Bearer
+	if tokenString == "" {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Token no proporcionado"})
+		return
+	}
+
+	// Parsear y validar el token
+	secret := os.Getenv("JWT_SECRET")
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		return []byte(secret), nil
+	})
+
+	if err != nil || !token.Valid {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Token inválido"})
+		return
+	}
+
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "No se pudieron leer los claims"})
+		return
+	}
+
+	c.JSON(http.StatusOK, claims)
 }

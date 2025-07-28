@@ -15,11 +15,12 @@ func setupRoutes(r *gin.Engine) {
 	// Cargar .env al iniciar la app
 	configs.LoadEnv()
 	// home controller
-	r.GET("/", configs.ViewAuthRequired(), controllers.HomeIndex)
-	// login controller
-	r.POST("/api/v1/sign-in/by-username", configs.ExtAPIAuthRequired(), controllers.LoginExtSignInByUsername)
-	r.POST("/api/v1/sign-in/by-email", configs.ExtAPIAuthRequired(), controllers.LoginExtSignInByEmail)
-	r.POST("/api/v1/sign-in/admin", configs.AdminAPIAuthRequired(), controllers.AdminSignInByHeader)
+	r.GET("/", controllers.HomeIndex)
+	// auth controller
+	r.POST("/api/v1/auth/by-username", configs.ExtAPIAuthRequired(), controllers.LoginExtSignInByUsername) //EXT
+	r.POST("/api/v1/auth/by-email", configs.ExtAPIAuthRequired(), controllers.LoginExtSignInByEmail)       //EXT
+	r.POST("/api/v1/auth/admin", configs.AdminAPIAuthRequired(), controllers.AdminSignInByHeader)
+	r.GET("/api/v1/auth/token", configs.AdminAPIAuthRequired(), controllers.ViewToken)
 	// system controller
 	r.GET("/api/v1/systems", configs.RequireAdminJWT(), controllers.SystemFetchAll)
 	r.POST("/api/v1/systems", configs.RequireAdminJWT(), controllers.SystemCreate)

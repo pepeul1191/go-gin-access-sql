@@ -5,53 +5,82 @@ import (
 	"os"
 	"strings"
 
-	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 )
 
-func ViewAuthRequired() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		session := sessions.Default(c)
-		if session.Get("status") != "activate" {
-			c.Redirect(302, "/login?error=Debe de estar logueado")
-			c.Abort()
-			return
-		}
-		c.Next()
-	}
-}
+func RequireJWT() gin.HandlerFunc {
+	secret := os.Getenv("JWT_SECRET")
 
-func ViewAuthGoToHome() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		session := sessions.Default(c)
-		if session.Get("status") == "activate" {
-			c.Redirect(302, "/")
-			c.Abort()
+		authHeader := c.GetHeader("Authorization")
+		if authHeader == "" || !strings.HasPrefix(authHeader, "Bearer ") {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Token no proporcionado"})
 			return
 		}
-		c.Next()
-	}
-}
 
-func APIAuthRequired() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		session := sessions.Default(c)
-		if session.Get("status") != "activate" {
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"error":   "Debe de estar logueado",
-				"message": "session status not activate",
-			})
-			c.Abort()
+		tokenString := strings.TrimPrefix(authHeader, "Bearer ")
+
+		// Parse con validación y claims
+		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+			// Validar el método de firma
+			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+				return nil, jwt.ErrTokenSignatureInvalid
+			}
+			return []byte(secret), nil
+		}, jwt.WithValidMethods([]string{"HS256"}))
+
+		if err != nil || !token.Valid {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Token inválido"})
 			return
 		}
+
+		claims, ok := token.Claims.(jwt.MapClaims)
+		if !ok {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "No se pudieron leer los claims"})
+			return
+		}
+
+		// Validar que el rol sea "admin"
+		role, ok := claims["role"].(string)
+		if !ok || role != "external" {
+			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "Acceso restringido a usuarios externos"})
+			return
+		}
+
+		//c.Set("user", claims)
 		c.Next()
 	}
 }
 
 func ExtAPIAuthRequired() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		// TODO
+		// Obtener el valor del header X-Auth-Admin-Trigger
+		incomingAuth := c.GetHeader("X-Auth-Trigger")
+
+		// Obtener el valor esperado del entorno
+		expectedAuth := os.Getenv("HTTP_X_AUTH_TRIGGER")
+
+		// Validar que ambos valores coincidan
+		if incomingAuth == "" {
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"error":   "Unauthorized",
+				"message": "Missing X-Auth header",
+			})
+			c.Abort()
+			return
+		}
+
+		if incomingAuth != expectedAuth {
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"error":   "Unauthorized",
+				"message": "Invalid X-Auth value",
+			})
+			c.Abort()
+			return
+		}
+
+		// Si la validación es exitosa, continuar con la siguiente función
 		c.Next()
 	}
 }
