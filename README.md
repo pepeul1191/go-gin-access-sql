@@ -60,7 +60,8 @@ Instalar dependencias de go:
     JWT_SECRET=k8sT!mZ$4KpQbR7sCv2EaXw&9LpQ
     DATABASE_URL=db/app.db
     HTTP_X_AUTH_ADMIN_TRIGGER=dXNlci1zdGlja3lfc2VjcmV0XzEyMzQ1Njc
-
+    HTTP_X_AUTH_TRIGGER=dXNlci1zdGlja3lfc2VjcmV0XzEyMzQ1Njc
+    
 ### Migraciones con DBMATE
 
 Instalar dependencias:
