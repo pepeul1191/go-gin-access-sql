@@ -4,6 +4,7 @@
   - [Configuraciones y Scripts](#configuraciones-y-scripts)
     - [Golang](#golang)
     - [Antes de usar los scripts](#antes-de-usar-los-scripts)
+    - [Archivo .env](#archivo-env)
     - [Migraciones con DBMATE](#migraciones-con-dbmate)
     - [Imágnes de PlantUML](#imágnes-de-plantuml)
   - [Documentación](#documentación)
@@ -52,6 +53,13 @@ Instalar dependencias de go:
 ### Antes de usar los scripts
 
     $ pip install faker
+
+### Archivo .env
+
+    DB=sqlite:db/app.db
+    JWT_SECRET=k8sT!mZ$4KpQbR7sCv2EaXw&9LpQ
+    DATABASE_URL=db/app.db
+    HTTP_X_AUTH_ADMIN_TRIGGER=dXNlci1zdGlja3lfc2VjcmV0XzEyMzQ1Njc
 
 ### Migraciones con DBMATE
 

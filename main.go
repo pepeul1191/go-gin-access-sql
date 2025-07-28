@@ -8,8 +8,6 @@ import (
 	"time"
 
 	"github.com/gin-contrib/cors"
-	"github.com/gin-contrib/sessions"
-	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
 )
 
@@ -18,13 +16,7 @@ func setupRoutes(r *gin.Engine) {
 	configs.LoadEnv()
 	// home controller
 	r.GET("/", configs.ViewAuthRequired(), controllers.HomeIndex)
-	r.GET("/systems", configs.ViewAuthRequired(), controllers.HomeIndex)
-	r.GET("/systems/:system_id/users", configs.ViewAuthRequired(), controllers.HomeIndex)
-	r.GET("/users", configs.ViewAuthRequired(), controllers.HomeIndex)
 	// login controller
-	r.GET("/login", configs.ViewAuthGoToHome(), controllers.LoginIndex)
-	r.POST("/login", controllers.LoginSignIn)
-	r.GET("/sign-out", controllers.LoginSignOut)
 	r.POST("/api/v1/sign-in/by-username", configs.ExtAPIAuthRequired(), controllers.LoginExtSignInByUsername)
 	r.POST("/api/v1/sign-in/by-email", configs.ExtAPIAuthRequired(), controllers.LoginExtSignInByEmail)
 	r.POST("/api/v1/sign-in/admin", configs.AdminAPIAuthRequired(), controllers.AdminSignInByHeader)
@@ -68,7 +60,7 @@ func main() {
 	// cors
 	// Middleware CORS
 	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:3000", "https://tudominio.com"},
+		AllowOrigins:     []string{"http://localhost:8081", "https://tudominio.com"},
 		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
 		ExposeHeaders:    []string{"Content-Length"},
@@ -79,11 +71,6 @@ func main() {
 	if err := configs.ConnectToDB(); err != nil {
 		log.Fatal("Error al iniciar DB:", err)
 	}
-	// settings
-	r.LoadHTMLGlob("views/*")
-	r.Static("/static", "./public")
-	store := cookie.NewStore([]byte("secret"))
-	r.Use(sessions.Sessions("mysession", store))
 	// load routes
 	setupRoutes(r)
 	r.Run(":8080")
