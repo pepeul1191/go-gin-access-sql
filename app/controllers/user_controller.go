@@ -15,28 +15,47 @@ import (
 func UserFetchAll(c *gin.Context) {
 	var users []models.UserSummary
 	var total int64
-	// Obtener parámetros opcionales
+
 	name := c.Query("name")
 	email := c.Query("email")
 	step := c.Query("step")
 	page := c.Query("page")
-	// Conexión a la base de datos
+
 	if configs.DB == nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Conexión DB no inicializada"})
 		return
 	}
-	// Comenzar la consulta
+
 	query := configs.DB.Model(&models.User{})
-	// Aplicar filtros opcionales
+
 	if name != "" {
 		query = query.Where("username LIKE ?", "%"+name+"%")
 	}
 	if email != "" {
 		query = query.Where("email LIKE ?", "%"+email+"%")
 	}
-	// Paginación (si step y page están presentes)
+
 	if step != "" && page != "" {
-		// Contar total (antes de paginar)
+		stepInt, err1 := strconv.Atoi(step)
+		pageInt, err2 := strconv.Atoi(page)
+
+		if err1 != nil || err2 != nil || stepInt <= 0 || pageInt <= 0 {
+			var msg string
+			if err1 != nil {
+				msg = "step inválido: " + err1.Error()
+			} else if err2 != nil {
+				msg = "page inválido: " + err2.Error()
+			} else {
+				msg = "Valores de paginación inválidos"
+			}
+
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error":   "Error al leer los parámetros de paginación",
+				"message": msg,
+			})
+			return
+		}
+
 		if err := query.Count(&total).Error; err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"error":   "Error al contar users",
@@ -44,46 +63,37 @@ func UserFetchAll(c *gin.Context) {
 			})
 			return
 		}
-		// traer pagina
-		stepInt, err1 := strconv.Atoi(step)
-		pageInt, err2 := strconv.Atoi(page)
-		if err1 == nil && err2 == nil && stepInt > 0 && pageInt > 0 {
-			offset := (pageInt - 1) * stepInt
-			query = query.Offset(offset).Limit(stepInt)
-			// Ejecutar la consulta
-			if err := query.Find(&users).Error; err != nil {
-				c.JSON(http.StatusInternalServerError, gin.H{
-					"error":   "Error al listar la lista paginada de sistemas",
-					"message": err.Error(),
-				})
-				return
-			}
-			// Respuesta
-			pages := int(math.Ceil(float64(total) / float64(stepInt)))
-			c.JSON(http.StatusOK, gin.H{
-				"list":   users,
-				"pages":  pages,
-				"total":  total,
-				"offset": offset,
-			})
-		}
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error":   "Error al leer los parametros de la paginación",
-			"message": err1.Error(),
-		})
-		return
-	} else {
-		// Ejecutar la consulta
+
+		offset := (pageInt - 1) * stepInt
+		query = query.Offset(offset).Limit(stepInt)
+
 		if err := query.Find(&users).Error; err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{
-				"error":   "Error al consultar users",
+				"error":   "Error al listar la lista paginada de usuarios",
 				"message": err.Error(),
 			})
 			return
 		}
-		// Respuesta
-		c.JSON(http.StatusOK, users)
+
+		pages := int(math.Ceil(float64(total) / float64(stepInt)))
+		c.JSON(http.StatusOK, gin.H{
+			"list":   users,
+			"pages":  pages,
+			"total":  total,
+			"offset": offset,
+		})
+		return
 	}
+
+	if err := query.Find(&users).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error":   "Error al consultar usuarios",
+			"message": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, users)
 }
 
 // POST: /apis/v1/users
