@@ -22,7 +22,8 @@ func setupRoutes(r *gin.Engine) {
 	r.GET("/login", configs.ViewAuthGoToHome(), controllers.LoginIndex)
 	r.POST("/login", controllers.LoginSignIn)
 	r.GET("/sign-out", controllers.LoginSignOut)
-	r.POST("/api/v1/sign-in", configs.ExtAPIAuthRequired(), controllers.LoginExtSignIn)
+	r.POST("/api/v1/sign-in/by-username", configs.ExtAPIAuthRequired(), controllers.LoginExtSignInByUsername)
+	r.POST("/api/v1/sign-in/by-email", configs.ExtAPIAuthRequired(), controllers.LoginExtSignInByEmail)
 	// system controller
 	r.GET("/api/v1/systems", configs.APIAuthRequired(), controllers.SystemFetchAll)
 	r.POST("/api/v1/systems", configs.APIAuthRequired(), controllers.SystemCreate)
@@ -54,6 +55,12 @@ func setupRoutes(r *gin.Engine) {
 
 func main() {
 	r := gin.Default()
+	// before all
+	r.Use(func(c *gin.Context) {
+		c.Header("X-Powered-By", "Gin")
+		c.Header("Server", "Ubuntu")
+		c.Next()
+	})
 	// load db
 	if err := configs.ConnectToDB(); err != nil {
 		log.Fatal("Error al iniciar DB:", err)

@@ -27,9 +27,15 @@ func (SystemUserView) TableName() string {
 	return "vw_system_users"
 }
 
-type ExtSystemUsersInput struct {
+type ExtSystemUsersUsernameInput struct {
 	SystemID uint   `json:"system_id"`
 	Username string `json:"username" binding:"required"`
+	Password string `json:"password" binding:"required"`
+}
+
+type ExtSystemUsersEmailInput struct {
+	SystemID uint   `json:"system_id"`
+	Email    string `json:"email" binding:"required"`
 	Password string `json:"password" binding:"required"`
 }
 
