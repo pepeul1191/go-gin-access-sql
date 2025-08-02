@@ -29,3 +29,8 @@ type CreatedPermissionResponse struct {
 	Tmp string `json:"tmp"`
 	ID  string `json:"id"`
 }
+
+type ExtPermission struct {
+	ID   uint   `json:"id"`
+	Name string `json:"name"`
+}

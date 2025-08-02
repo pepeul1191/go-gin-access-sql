@@ -58,19 +58,52 @@ func LoginExtSignInByUsername(c *gin.Context) {
 		return
 	}
 
-	// armar respuesta
+	var roles []models.Role
+	if err := configs.DB.
+		Joins("JOIN systems_users_roles sur ON sur.role_id = roles.id").
+		Where("sur.user_id = ? AND sur.system_id = ?", existingUser.ID, req.SystemID).
+		Find(&roles).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Error al cargar roles", "error": err.Error()})
+		return
+	}
+
+	var userRoles []models.ExtRoleWithPermissions
+	for _, role := range roles {
+		var permissions []models.ExtPermission
+		if err := configs.DB.
+			Raw(`
+				SELECT p.id, p.name
+				FROM permissions p
+				JOIN systems_users_permissions sup ON sup.permission_id = p.id
+				WHERE p.role_id = ? AND sup.user_id = ? AND sup.system_id = ?
+			`, role.ID, existingUser.ID, req.SystemID).
+			Scan(&permissions).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"message": "Error al cargar permisos", "error": err.Error()})
+			return
+		}
+
+		userRoles = append(userRoles, models.ExtRoleWithPermissions{
+			ID:          role.ID,
+			Name:        role.Name,
+			Permissions: permissions,
+		})
+	}
+
+	// Armar respuesta final
 	if existingUser.Activated {
-		var userLogged models.ExtSystemUsersOutput
-		userLogged.Email = existingUser.Email
-		userLogged.Username = existingUser.Username
-		userLogged.SystemID = req.SystemID
-		userLogged.ID = existingUser.ID
-		userLogged.Token = signedToken
-		// devolver datos de usuario
+		userLogged := models.ExtSystemUsersOutput{
+			Email:    existingUser.Email,
+			Username: existingUser.Username,
+			SystemID: req.SystemID,
+			ID:       existingUser.ID,
+			Token:    signedToken,
+			Roles:    userRoles,
+		}
 		c.JSON(http.StatusOK, userLogged)
 	} else {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Cuenta de usuario no activa", "error": "activated = false"})
 	}
+
 }
 
 func LoginExtSignInByEmail(c *gin.Context) {

@@ -29,3 +29,9 @@ type CreatedRoleResponse struct {
 	Tmp string `json:"tmp"`
 	ID  string `json:"id"`
 }
+
+type ExtRoleWithPermissions struct {
+	ID          uint            `json:"id"`
+	Name        string          `json:"name"`
+	Permissions []ExtPermission `json:"permissions"`
+}
