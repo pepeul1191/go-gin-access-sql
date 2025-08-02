@@ -71,3 +71,8 @@ type UserPermissionWithRegistrationStatus struct {
 	Name         string `json:"name" binding:"required"`
 	Registered   bool   `json:"registered" gorm:"column:registered"`
 }
+
+type UserLoggedRolesPermissions struct {
+	Role        string   `json:"role" binding:"required"`
+	Permissions []string `json:"permissions" binding:"required"`
+}

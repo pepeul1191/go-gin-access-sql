@@ -40,10 +40,10 @@ type ExtSystemUsersEmailInput struct {
 }
 
 type ExtSystemUsersOutput struct {
-	ID       uint                     `json:"id"`
-	Username string                   `json:"username"`
-	Email    string                   `json:"email"`
-	SystemID uint                     `json:"system_id"`
-	Token    string                   `json:"token"`
-	Roles    []ExtRoleWithPermissions `json:"roles"`
+	ID       uint                         `json:"id"`
+	Username string                       `json:"username"`
+	Email    string                       `json:"email"`
+	SystemID uint                         `json:"system_id"`
+	Token    string                       `json:"token"`
+	Roles    []UserLoggedRolesPermissions `json:"roles"`
 }

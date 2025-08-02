@@ -67,8 +67,9 @@ func LoginExtSignInByUsername(c *gin.Context) {
 		return
 	}
 
-	var userRoles []models.ExtRoleWithPermissions
+	var userRolesPermissions []models.UserLoggedRolesPermissions
 	for _, role := range roles {
+
 		var permissions []models.ExtPermission
 		if err := configs.DB.
 			Raw(`
@@ -82,10 +83,14 @@ func LoginExtSignInByUsername(c *gin.Context) {
 			return
 		}
 
-		userRoles = append(userRoles, models.ExtRoleWithPermissions{
-			ID:          role.ID,
-			Name:        role.Name,
-			Permissions: permissions,
+		var permissionsNames []string
+		for _, permission := range permissions {
+			permissionsNames = append(permissionsNames, permission.Name)
+		}
+
+		userRolesPermissions = append(userRolesPermissions, models.UserLoggedRolesPermissions{
+			Role:        role.Name,
+			Permissions: permissionsNames,
 		})
 	}
 
@@ -97,7 +102,7 @@ func LoginExtSignInByUsername(c *gin.Context) {
 			SystemID: req.SystemID,
 			ID:       existingUser.ID,
 			Token:    signedToken,
-			Roles:    userRoles,
+			Roles:    userRolesPermissions,
 		}
 		c.JSON(http.StatusOK, userLogged)
 	} else {
