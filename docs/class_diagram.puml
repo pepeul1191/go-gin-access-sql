@@ -30,7 +30,7 @@ class Role {
   - systemId: int
 }
 
-class Permission {
+class Role {
   - id: int
   - name: String
   - description: String
@@ -54,6 +54,14 @@ class SystemUserPermission {
   - permission_id: int
 }
 
+class SystemUserRole {
+  - id: int
+  - created: DateTime
+  - system_id: int
+  - user_id: int
+  - role_id: int
+}
+
 System "1" -- "m" Role
 Role "1" -- "m" Permission
 User "1" -- "m" SystemUser
@@ -61,5 +69,8 @@ System "1" -- "m" SystemUser
 User "1" -- "m" SystemUserPermission
 System "1" -- "m" SystemUserPermission
 Permission "1" -- "m" SystemUserPermission
+User "1" -- "m" SystemUserRole
+System "1" -- "m" SystemUserRole
+Role "1" -- "m" SystemUserRole
 
 @enduml
